@@ -2,22 +2,15 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
-public class Testing : MonoBehaviour
+public class WelcomePanel : MonoBehaviour
 {
-    public CanvasGroup myCanvasGroup;
+    private CanvasGroup myCanvasGroup;
     public float fadeInDuration = 1f;
-    public Text screenText;
-    public InputField myInput;
-    public Button okClick;
 
     void Start()
     {
+        myCanvasGroup = GetComponent<CanvasGroup>();
         StartCoroutine(FadeIn());
-        okClick.onClick.AddListener(ShowMessage);
-    }
-    public void ShowMessage()
-    {
-        screenText.text = myInput.text;
     }
     IEnumerator FadeIn()
     {
