@@ -8,6 +8,7 @@ public class MainmenuManager : MonoBehaviour
     public float fadeInDuration = 1f; // Duration for fade-in effect
     public float fadeOutDuration = 1f; // Duration for fade-out effect
     public float timeBetweenScreens = 2f; // Time delay between fading in screens
+    public float startScene;
 
     void Start()
     {
@@ -23,7 +24,7 @@ public class MainmenuManager : MonoBehaviour
             screen.alpha = 0f;
             screen.blocksRaycasts = false;
         }
-
+        yield return new WaitForSeconds(startScene);
         // Fade in each screen sequentially
         foreach (CanvasGroup screen in screens)
         {

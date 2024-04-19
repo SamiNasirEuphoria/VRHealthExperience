@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/AVProVideo/Demos/Scenes/Demo_360Stereo.unity
     guid: ca8fdd4aa85509743878be7fbacf5a4f
+  - enabled: 0
+    path: Assets/BNG Framework/Scenes/XR Demo.unity
+    guid: a1360534006d3f845bc79b46b93cfec5
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 558bdae097bba47718d1f477e1a6f038,
       type: 2}
