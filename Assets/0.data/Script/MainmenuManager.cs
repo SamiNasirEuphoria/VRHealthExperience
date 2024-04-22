@@ -1,39 +1,77 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MainmenuManager : MonoBehaviour
 {
-    public CanvasGroup[] screens; // Array to hold CanvasGroups of all screens
-    public float fadeInDuration = 1f; // Duration for fade-in effect
-    public float fadeOutDuration = 1f; // Duration for fade-out effect
-    public float timeBetweenScreens = 2f; // Time delay between fading in screens
+    private CanvasGroup welcomesScreen, introScreen, controllerScreen, modeScreen; // Array to hold CanvasGroups of all screens
+    public float fadeInDuration = 1f; 
+    public float fadeOutDuration = 1f; 
+    public float timeBetweenScreens = 2f; 
     public float startScene;
-
+    public static int modeSelected;
     void Start()
     {
+        welcomesScreen = UIReferenceContainer.Instance.welcomeScreen.GetComponent<CanvasGroup>();
+        introScreen = UIReferenceContainer.Instance.introScreen.GetComponent<CanvasGroup>();
+        controllerScreen = UIReferenceContainer.Instance.controllerScreen.GetComponent<CanvasGroup>();
+        modeScreen = UIReferenceContainer.Instance.modesScreen.GetComponent<CanvasGroup>();
 
-        StartCoroutine(FadeInScreensSequentially());
+        welcomesScreen.alpha = 0f;
+        introScreen.alpha = 0f;
+        controllerScreen.alpha = 0f;
+        modeScreen.alpha = 0f;
+
+        welcomesScreen.blocksRaycasts = false;
+        introScreen.blocksRaycasts = false;
+        controllerScreen.blocksRaycasts = false;
+        modeScreen.blocksRaycasts = false;
+
+
+        StartCoroutine(FadeInScreen());
+
+        UIReferenceContainer.Instance.welcomeScreenButton.onClick.AddListener(WelcomeScreenButton);
+        UIReferenceContainer.Instance.introScreenButton.onClick.AddListener(IntroScreenButton);
+        UIReferenceContainer.Instance.controllerScreenButton.onClick.AddListener(ControllerScreenButton);
+        //UIReferenceContainer.Instance.modeScreenButton.onClick.AddListener(ModeScreenButton);
+
     }
-
-    IEnumerator FadeInScreensSequentially()
+   
+    public void WelcomeScreenButton()
     {
-        // Initial setup: set all screens to fully transparent and disable raycast targeting
-        foreach (CanvasGroup screen in screens)
-        {
-            screen.alpha = 0f;
-            screen.blocksRaycasts = false;
-        }
-        yield return new WaitForSeconds(startScene);
-        // Fade in each screen sequentially
-        foreach (CanvasGroup screen in screens)
-        {
-            yield return FadeScreen(screen, 1f, fadeInDuration);
-            yield return new WaitForSeconds(timeBetweenScreens);
-            yield return FadeScreen(screen, 0f, fadeOutDuration);
-        }
+       StartCoroutine(Fade(welcomesScreen, introScreen))  ;
     }
+    public void IntroScreenButton()
+    {
+        StartCoroutine(Fade(introScreen,controllerScreen));
+    }
+    public void ControllerScreenButton()
+    {
+        StartCoroutine(Fade(controllerScreen,modeScreen));
+    }
+    public void ModeScreenButton()
+    {
+        StartCoroutine(FadeOutScreen());
+       
+    }
+    IEnumerator FadeInScreen()
+    {
+        yield return new WaitForSeconds(startScene);
+        yield return FadeScreen(welcomesScreen, 1f, fadeInDuration);
+    }
+    IEnumerator FadeOutScreen()
+    {
+        yield return new WaitForSeconds(0.05f);
+        yield return FadeScreen(modeScreen, 0f, fadeOutDuration);
+        SceneHandler.Instance.Load("OpenHealthVR-Main");
+    }
+    IEnumerator Fade(CanvasGroup currentScreen, CanvasGroup nextScreen)
+    {
+        Debug.Log("fade method");
+        yield return StartCoroutine(FadeScreen(currentScreen, 0f, fadeOutDuration));
+        yield return StartCoroutine(FadeScreen(nextScreen, 1f, fadeInDuration));
+        Debug.Log("fade method");
 
+    }
     IEnumerator FadeScreen(CanvasGroup screen, float targetAlpha, float duration)
     {
         float elapsedTime = 0f;

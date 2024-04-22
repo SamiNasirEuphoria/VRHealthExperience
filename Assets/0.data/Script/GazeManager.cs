@@ -31,7 +31,6 @@ public class GazeManager : MonoBehaviour {
                     hitInfo.collider.gameObject.GetComponent<GazeEvent>().OnGazeComplete();
                 }
             }
-
         }
         else
         {

@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIReferenceContainer : MonoBehaviour
 {
@@ -24,4 +23,5 @@ public class UIReferenceContainer : MonoBehaviour
         }
     }
     public GameObject welcomeScreen, introScreen, controllerScreen,modesScreen;
+    public Button welcomeScreenButton, introScreenButton, controllerScreenButton, modeScreenButton;
 }

@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SceneHandler : MonoBehaviour
 {
@@ -26,5 +25,8 @@ public class SceneHandler : MonoBehaviour
     {
         DontDestroyOnLoad(this);
     }
-
+    public void Load(string sceneName)
+    {
+        SceneManager.LoadSceneAsync(sceneName);
+    }
 }
