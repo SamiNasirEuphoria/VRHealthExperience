@@ -1039,7 +1039,7 @@ MonoBehaviour:
   exit: {fileID: 1126708133}
   play: {fileID: 675896911}
   pause: {fileID: 340762006}
-  startScene: 4.5
+  startScene: 3
   outerSphere: {fileID: 939090645}
   myGroup: {fileID: 1188602208}
 --- !u!4 &760088912
@@ -1307,7 +1307,7 @@ Transform:
   m_GameObject: {fileID: 939090645}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10001, y: 10001, z: 10001}
+  m_LocalScale: {x: 5000, y: 5000, z: 5000}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -1942,7 +1942,7 @@ Transform:
   m_GameObject: {fileID: 1226196471}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 13784.841, y: 13784.841, z: 13784.841}
+  m_LocalScale: {x: 2000, y: 2000, z: 2000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

@@ -764,7 +764,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: db39bb6249db0924bb87d6e0bb294ed3, type: 2}
+  - {fileID: 2100000, guid: 9012bacf3c56749f3bc0edc49607aa3b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -803,7 +803,7 @@ Transform:
   m_GameObject: {fileID: 324568399}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20482.07, y: 20482.07, z: 20482.07}
+  m_LocalScale: {x: 5000, y: 5000, z: 5000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1623,7 +1623,7 @@ Transform:
   m_GameObject: {fileID: 1226196471}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 30602.377, y: 30602.377, z: 30602.377}
+  m_LocalScale: {x: 2000, y: 2000, z: 2000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1925,10 +1925,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26cea90019d1e48e8b2b73b5c5f827dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInDuration: 2
-  fadeOutDuration: 2
+  fadeInDuration: 1.5
+  fadeOutDuration: 1.5
   timeBetweenScreens: 5
-  startScene: 4.5
+  startScene: 3
 --- !u!1 &1895747078
 GameObject:
   m_ObjectHideFlags: 0

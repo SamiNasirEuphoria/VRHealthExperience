@@ -14,9 +14,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/0.data/Scene/OpenHealthVR-BackToMenu.unity
     guid: 76895a836a1564524bc699d8f7c02a7b
-  - enabled: 0
-    path: Assets/0.data/Scene/OpenHealthVR-Menu (test).unity
-    guid: 2a027bd4909b74ec887ae5bff652efbb
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 558bdae097bba47718d1f477e1a6f038,
       type: 2}
