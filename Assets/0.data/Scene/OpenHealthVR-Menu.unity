@@ -1929,6 +1929,7 @@ MonoBehaviour:
   fadeOutDuration: 1.5
   timeBetweenScreens: 5
   startScene: 3
+  myAnimator: {fileID: 1226196472}
 --- !u!1 &1895747078
 GameObject:
   m_ObjectHideFlags: 0

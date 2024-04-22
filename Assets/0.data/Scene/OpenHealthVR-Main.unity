@@ -293,7 +293,7 @@ MonoBehaviour:
   SupportsBothTouchPadAndJoystick: 0
   SupportsIndexTouch: 0
   SupportsThumbTouch: 0
-  ShowInputDebugger: 0
+  ShowInputDebugger: 1
 --- !u!4 &31977031
 Transform:
   m_ObjectHideFlags: 0
@@ -1039,9 +1039,10 @@ MonoBehaviour:
   exit: {fileID: 1126708133}
   play: {fileID: 675896911}
   pause: {fileID: 340762006}
-  startScene: 3
+  startScene: 0.5
   outerSphere: {fileID: 939090645}
   myGroup: {fileID: 1188602208}
+  myAnimator: {fileID: 1226196472}
 --- !u!4 &760088912
 Transform:
   m_ObjectHideFlags: 0

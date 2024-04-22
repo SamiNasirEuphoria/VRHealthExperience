@@ -1,17 +1,19 @@
 using UnityEngine;
 using RenderHeads.Media.AVProVideo;
-using UnityEngine.UI;
+using BNG;
 using System.Collections;
 
 public class ExperienceManager : MonoBehaviour
 {
     public ApplyToMesh meshMedia;
     public MediaPlayer[] videPlayer;
-    public Button exit, play,pause;
+    public UnityEngine.UI.Button exit, play,pause;
     public float startScene;
     public GameObject outerSphere;
     private ApplyToMesh myPlayer;
     public CanvasGroup myGroup;
+    public Animator myAnimator;
+    private bool check;
     private void Start()
     {
         myGroup.alpha = 0;
@@ -26,17 +28,25 @@ public class ExperienceManager : MonoBehaviour
         play.onClick.AddListener(Play);
         pause.onClick.AddListener(Pause);
         StartCoroutine(Wait());
-        StartCoroutine(FadeInScreen());
+        check = true;
+    }
+    private void Update()
+    {
+        if (InputBridge.Instance.RightTriggerDown && check)
+        {
+            StartCoroutine(FadeInScreen());
+            check = false;
+        }
     }
     IEnumerator FadeInScreen()
     {
         yield return new WaitForSeconds(startScene);
         yield return FadeScreen(myGroup, 1f, 2);
-        yield return new WaitForEndOfFrame();
-        videPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
+        
     }
     IEnumerator FadeOutScreen()
     {
+        myAnimator.SetTrigger("FadeIn");
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(myGroup, 0f, 2);
         SceneHandler.Instance.Load("OpenHealthVR-BackToMenu");
@@ -71,5 +81,7 @@ public class ExperienceManager : MonoBehaviour
         yield return new WaitForSeconds(startScene);
         yield return new WaitForSeconds(0.75f);
         myPlayer.enabled = true;
+        yield return new WaitForEndOfFrame();
+        videPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
     }
 }

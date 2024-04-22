@@ -9,6 +9,7 @@ public class ModeHandler : MonoBehaviour
     public float timeBetweenScreens = 2f;
     public float startScene;
     public static int modeSelected;
+    public Animator myAnimator;
     void Start()
     {
         modeScreen.alpha = 0;
@@ -26,6 +27,7 @@ public class ModeHandler : MonoBehaviour
     }
     IEnumerator FadeOutScreen()
     {
+        myAnimator.SetTrigger("FadeIn");
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(modeScreen, 0f, fadeOutDuration);
 
