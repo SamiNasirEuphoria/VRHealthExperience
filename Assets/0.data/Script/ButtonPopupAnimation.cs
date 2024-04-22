@@ -22,7 +22,7 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         //{
             if (!check)
             {
-                buttonTransform.DOScale(Vector3.one * 1.25f, 0.25f);
+                buttonTransform.DOScale(Vector3.one * 1.05f, 0.25f);
             }
         //}
        
