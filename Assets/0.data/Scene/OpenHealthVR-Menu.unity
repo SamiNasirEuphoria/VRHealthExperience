@@ -1927,8 +1927,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeInDuration: 1.5
   fadeOutDuration: 1.5
-  timeBetweenScreens: 5
-  startScene: 3
+  timeBetweenScreens: 1.5
+  startScene: 1.5
   myAnimator: {fileID: 1226196472}
 --- !u!1 &1895747078
 GameObject:

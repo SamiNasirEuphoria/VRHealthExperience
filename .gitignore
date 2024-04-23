@@ -71,3 +71,15 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Packages
+Assets/StreamingAssets/AVProVideoSamples/OH_Video_1.mp4
+Assets/StreamingAssets/AVProVideoSamples/OH_Video_2.mp4
+Assets/StreamingAssets/AVProVideoSamples/OH_Video_1.mp4.meta
+Assets/StreamingAssets/AVProVideoSamples/OH_Video_2.mp4.meta
+Assets/StreamingAssets/AVProVideoSamples/OH_Video_3.mp4
+Assets/StreamingAssets/AVProVideoSamples/OH_Video_3.mp4.meta
+Assets/0.data/Video/OH_Video_1.mp4
+Assets/0.data/Video/OH_Video_1.mp4.meta
+Assets/0.data/Video/OH_Video_2.mp4
+Assets/0.data/Video/OH_Video_2.mp4.meta
+Assets/0.data/Video/OH_Video_3.mp4
+Assets/0.data/Video/OH_Video_3.mp4.meta

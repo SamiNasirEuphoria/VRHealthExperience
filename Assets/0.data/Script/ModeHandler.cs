@@ -6,7 +6,6 @@ public class ModeHandler : MonoBehaviour
     public CanvasGroup modeScreen; // Array to hold CanvasGroups of all screens
     public float fadeInDuration = 1f;
     public float fadeOutDuration = 1f;
-    public float timeBetweenScreens = 2f;
     public float startScene;
     public static int modeSelected;
     public Animator myAnimator;

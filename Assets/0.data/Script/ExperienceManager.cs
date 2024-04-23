@@ -8,15 +8,17 @@ public class ExperienceManager : MonoBehaviour
     public ApplyToMesh meshMedia;
     public MediaPlayer[] videPlayer;
     public UnityEngine.UI.Button exit, play,pause;
-    public float startScene;
-    public GameObject outerSphere;
+   
+    public GameObject outerSphere, canvesPanel;
     private ApplyToMesh myPlayer;
     public CanvasGroup myGroup;
     public Animator myAnimator;
+    public float startScene, fadeInScreen, fadeOutScreen;
     private bool check;
     private void Start()
     {
         myGroup.alpha = 0;
+        canvesPanel.SetActive(false);
         myPlayer = outerSphere.GetComponent<ApplyToMesh>();
         myPlayer.enabled = false;
         foreach (MediaPlayer player in videPlayer)
@@ -34,21 +36,22 @@ public class ExperienceManager : MonoBehaviour
     {
         if (InputBridge.Instance.RightTriggerDown && check)
         {
+            canvesPanel.SetActive(true);
             StartCoroutine(FadeInScreen());
             check = false;
         }
     }
     IEnumerator FadeInScreen()
     {
-        yield return new WaitForSeconds(startScene);
-        yield return FadeScreen(myGroup, 1f, 2);
+        yield return new WaitForSeconds(0.05f);
+        yield return FadeScreen(myGroup, 1f, fadeInScreen);
         
     }
     IEnumerator FadeOutScreen()
     {
         myAnimator.SetTrigger("FadeIn");
         yield return new WaitForSeconds(0.05f);
-        yield return FadeScreen(myGroup, 0f, 2);
+        yield return FadeScreen(myGroup, 0f, fadeOutScreen);
         SceneHandler.Instance.Load("OpenHealthVR-BackToMenu");
     }
     IEnumerator FadeScreen(CanvasGroup screen, float targetAlpha, float duration)
@@ -79,7 +82,7 @@ public class ExperienceManager : MonoBehaviour
     IEnumerator Wait()
     {
         yield return new WaitForSeconds(startScene);
-        yield return new WaitForSeconds(0.75f);
+        yield return new WaitForSeconds(0.25f);
         myPlayer.enabled = true;
         yield return new WaitForEndOfFrame();
         videPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
