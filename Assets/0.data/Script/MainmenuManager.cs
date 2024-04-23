@@ -67,12 +67,9 @@ public class MainmenuManager : MonoBehaviour
         SceneHandler.Instance.Load("OpenHealthVR-Main");
     }
     IEnumerator Fade(CanvasGroup currentScreen, CanvasGroup nextScreen)
-    {
-        Debug.Log("fade method");
+    {   
         yield return StartCoroutine(FadeScreen(currentScreen, 0f, fadeOutDuration));
         yield return StartCoroutine(FadeScreen(nextScreen, 1f, fadeInDuration));
-        Debug.Log("fade method");
-
     }
     IEnumerator FadeScreen(CanvasGroup screen, float targetAlpha, float duration)
     {

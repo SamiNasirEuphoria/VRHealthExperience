@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections; 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
@@ -42,9 +43,15 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (!isPlayPause)
         {
+            buttonTransform.DOScale(Vector3.one * 1.75f, 0.25f);
             button.interactable = false;
-            buttonTransform.DOScale(Vector3.one, 0.25f);
+            StartCoroutine(Wait());
             check = true;
         }
+    }
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(0.3f);
+        buttonTransform.DOScale(Vector3.one, 0.25f);
     }
 }
