@@ -2,6 +2,7 @@ using UnityEngine;
 using RenderHeads.Media.AVProVideo;
 using BNG;
 using System.Collections;
+using UnityEngine.Events;
 
 public class ExperienceManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class ExperienceManager : MonoBehaviour
     public Animator myAnimator;
     public float startScene, fadeInScreen, fadeOutScreen;
     private bool check;
+    public UnityEvent buttonResetState;
     private void Start()
     {
         myGroup.alpha = 0;
@@ -50,6 +52,7 @@ public class ExperienceManager : MonoBehaviour
     IEnumerator FadeOutScreen()
     {
         myAnimator.SetTrigger("FadeIn");
+        buttonResetState.Invoke();
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(myGroup, 0f, fadeOutScreen);
         SceneHandler.Instance.Load("OpenHealthVR-BackToMenu");

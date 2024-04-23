@@ -509,7 +509,7 @@ GameObject:
   - component: {fileID: 340762006}
   - component: {fileID: 340762005}
   m_Layer: 5
-  m_Name: Button (Legacy) (2)
+  m_Name: Pause
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -522,7 +522,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 340762003}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -879,7 +879,7 @@ GameObject:
   - component: {fileID: 675896911}
   - component: {fileID: 675896910}
   m_Layer: 5
-  m_Name: Button (Legacy) (1)
+  m_Name: Play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -892,7 +892,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675896908}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1011,6 +1011,7 @@ GameObject:
   m_Component:
   - component: {fileID: 760088912}
   - component: {fileID: 760088911}
+  - component: {fileID: 760088913}
   m_Layer: 0
   m_Name: ExperienceManager
   m_TagString: Untagged
@@ -1046,6 +1047,21 @@ MonoBehaviour:
   startScene: 1.5
   fadeInScreen: 2
   fadeOutScreen: 2
+  buttonResetState:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 760088913}
+        m_TargetAssemblyTypeName: ToggleButton, Assembly-CSharp
+        m_MethodName: ResetScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!4 &760088912
 Transform:
   m_ObjectHideFlags: 0
@@ -1061,6 +1077,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &760088913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760088910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 410a6a0faa7fe4cfeb7dee6ac4dce413, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonPlay: {fileID: 675896911}
+  buttonPause: {fileID: 340762006}
+  normalSpritePlay: {fileID: 21300000, guid: 03ff5a20c18cd4de09e6520d7d175c94, type: 3}
+  normalSpritePause: {fileID: 21300000, guid: b5476ddfa2b2b4c599848c0ade4565df, type: 3}
+  selectedSpritePlay: {fileID: 21300000, guid: 57ca0506410c74eda8f50547a664142f, type: 3}
+  selectedSpritePause: {fileID: 21300000, guid: 577337a1392624e66a1aa68cfc31bd0c,
+    type: 3}
 --- !u!1 &840959399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1633,7 +1668,7 @@ GameObject:
   - component: {fileID: 1126708133}
   - component: {fileID: 1126708135}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1742,7 +1777,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126708132}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1792,10 +1827,10 @@ RectTransform:
   m_Father: {fileID: 2025556956}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 125, y: 85}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1188602208
 CanvasGroup:

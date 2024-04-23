@@ -313,6 +313,7 @@ GameObject:
   - component: {fileID: 531512542}
   - component: {fileID: 531512541}
   - component: {fileID: 531512540}
+  - component: {fileID: 531512543}
   m_Layer: 5
   m_Name: ModeSelectionScreen
   m_TagString: Untagged
@@ -394,6 +395,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 531512538}
   m_CullTransparentMesh: 1
+--- !u!114 &531512543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531512538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43f6e87a848a34d48a8794c63a46f71d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttons:
+  - {fileID: 1426986633}
+  - {fileID: 706722995}
+  - {fileID: 1687435144}
+  - {fileID: 834632360}
 --- !u!1 &706722991
 GameObject:
   m_ObjectHideFlags: 0

@@ -31,18 +31,19 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         //if (!isPlayPause)
         //{
-            //if (!check)
-            //{
+            if (!check)
+            {
                 buttonTransform.DOScale(Vector3.one, 0.25f);
-            //}
+            }
         //}
-       
+
     }
     public void Clicked()
     {
         if (!isPlayPause)
         {
             button.interactable = false;
+            buttonTransform.DOScale(Vector3.one, 0.25f);
             check = true;
         }
     }
