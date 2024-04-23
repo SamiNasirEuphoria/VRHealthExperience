@@ -13,12 +13,17 @@ public class ToggleButton : MonoBehaviour
 
     void Start()
     {
-        // Assign click listeners to buttons
+        StartScene();
+    }
+    void StartScene()
+    {
         buttonPlay.onClick.AddListener(ToggleButton1);
         buttonPause.onClick.AddListener(ToggleButton2);
-        ToggleButton1();
+        buttonPlay.GetComponent<ButtonPopupAnimation>().enabled = true;
+        buttonPause.GetComponent<ButtonPopupAnimation>().enabled = true;
+        buttonPlay.image.sprite = selectedSpritePlay;
+        buttonPause.image.sprite = normalSpritePause;
     }
-
     void ToggleButton1()
     {
         buttonPlay.image.sprite = selectedSpritePlay;
@@ -34,5 +39,7 @@ public class ToggleButton : MonoBehaviour
     {
         buttonPlay.image.sprite = normalSpritePlay;
         buttonPause.image.sprite = normalSpritePause;
+        buttonPlay.GetComponent<ButtonPopupAnimation>().enabled = false;
+        buttonPause.GetComponent<ButtonPopupAnimation>().enabled = false;
     }
 }
