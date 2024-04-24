@@ -43,10 +43,15 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (!isPlayPause)
         {
-            buttonTransform.DOScale(Vector3.one * 1.75f, 0.25f);
+            buttonTransform.DOScale(Vector3.one * 1.20f, 0.25f);
             button.interactable = false;
             StartCoroutine(Wait());
             check = true;
+        }
+        else
+        {
+            buttonTransform.DOScale(Vector3.one * 1.20f, 0.25f);
+            StartCoroutine(Wait());
         }
     }
     IEnumerator Wait()

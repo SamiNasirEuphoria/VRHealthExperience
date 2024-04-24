@@ -10,7 +10,7 @@ public class ExperienceManager : MonoBehaviour
     public MediaPlayer[] videoPlayer;
     public UnityEngine.UI.Button exit, play,pause, rewind;
    
-    public GameObject outerSphere, canvesPanel;
+    public GameObject outerSphere, canvesPanel, camreferenceObject;
     private ApplyToMesh myPlayer;
     public CanvasGroup myGroup;
     public Animator myAnimator;
@@ -39,22 +39,36 @@ public class ExperienceManager : MonoBehaviour
     {
         if (InputBridge.Instance.RightTriggerDown && check)
         {
+            //canvesPanel.transform.SetParent(camreferenceObject.transform);
             canvesPanel.SetActive(true);
+            //canvesPanel.transform.localPosition = new Vector3(0, 0, 0);
+            //canvesPanel.transform.localEulerAngles = new Vector3(0, 0, 0);
+            //canvesPanel.transform.SetParent(null);
+            //canvesPanel.transform.position = camreferenceObject.transform.position;
             StartCoroutine(FadeInScreen());
             check = false;
         }
+    }
+    public void ButtonsState(bool check)
+    {
+        exit.interactable = check;
+        play.interactable = check;
+        rewind.interactable = check;
+        pause.interactable = check;
     }
     IEnumerator FadeInScreen()
     {
         Debug.Log("Calling screen fade in");
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(myGroup, 1f, fadeInScreen);
+        ButtonsState(true);
         StartCoroutine(FadeOutScreen());
     }
     IEnumerator FadeOutScreen()
     {
             Debug.Log("calling screen fade out");
-            yield return new WaitForSeconds(8.5f);
+            yield return new WaitForSeconds(7.5f);
+            ButtonsState(false);
             yield return FadeScreen(myGroup, 0f, fadeOutScreen);
             canvesPanel.SetActive(false);
             check = true;
@@ -86,18 +100,18 @@ public class ExperienceManager : MonoBehaviour
     }
     public void Play()
     {
-        StopCoroutine(FadeOutScreen());
+        StopAllCoroutines();
         videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
         StartCoroutine(FadeOutScreen());
     }
     public void Pause()
     {
-        StopCoroutine(FadeOutScreen());
+        StopAllCoroutines();
         videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(false);
     }
     public void Rewind()
     {
-        StopCoroutine(FadeOutScreen());
+        StopAllCoroutines();
         videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Rewind(true);
         videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Play();
         StartCoroutine(FadeOutScreen());
