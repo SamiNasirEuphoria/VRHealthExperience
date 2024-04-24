@@ -23,7 +23,7 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         //{
             if (!check)
             {
-                buttonTransform.DOScale(Vector3.one * 1.05f, 0.25f);
+                buttonTransform.DOScale(Vector3.one * 1.05f, 0.75f);
             }
         //}
        
@@ -34,7 +34,7 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         //{
             if (!check)
             {
-                buttonTransform.DOScale(Vector3.one, 0.25f);
+                buttonTransform.DOScale(Vector3.one, 0.75f);
             }
         //}
 
@@ -43,20 +43,20 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (!isPlayPause)
         {
-            buttonTransform.DOScale(Vector3.one * 1.20f, 0.25f);
+            buttonTransform.DOScale(Vector3.one * 1.10f, 0.75f);
             button.interactable = false;
             StartCoroutine(Wait());
             check = true;
         }
         else
         {
-            buttonTransform.DOScale(Vector3.one * 1.20f, 0.25f);
+            buttonTransform.DOScale(Vector3.one * 1.10f, 0.75f);
             StartCoroutine(Wait());
         }
     }
     IEnumerator Wait()
     {
         yield return new WaitForSeconds(0.3f);
-        buttonTransform.DOScale(Vector3.one, 0.25f);
+        buttonTransform.DOScale(Vector3.one, 0.75f);
     }
 }

@@ -15,7 +15,7 @@ public class ExperienceManager : MonoBehaviour
     public CanvasGroup myGroup;
     public Animator myAnimator;
     public float startScene, fadeInScreen, fadeOutScreen;
-    private bool check;
+    private bool check, _check;
     public UnityEvent buttonResetState;
     private void Start()
     {
@@ -34,20 +34,30 @@ public class ExperienceManager : MonoBehaviour
         rewind.onClick.AddListener(Rewind);
         StartCoroutine(Wait());
         check = true;
+        _check = true;
     }
     private void Update()
     {
         if (InputBridge.Instance.RightTriggerDown && check)
         {
-            //canvesPanel.transform.SetParent(camreferenceObject.transform);
-            canvesPanel.SetActive(true);
-            //canvesPanel.transform.localPosition = new Vector3(0, 0, 0);
-            //canvesPanel.transform.localEulerAngles = new Vector3(0, 0, 0);
-            //canvesPanel.transform.SetParent(null);
-            //canvesPanel.transform.position = camreferenceObject.transform.position;
+            CanvesPosition();
             StartCoroutine(FadeInScreen());
             check = false;
         }
+    }
+    public void CanvesPosition()
+    {
+        if (_check)
+        {
+            canvesPanel.transform.SetParent(camreferenceObject.transform);
+            canvesPanel.SetActive(true);
+            canvesPanel.transform.position = new Vector3(0, 0, 0);
+            canvesPanel.transform.eulerAngles = new Vector3(0, 0, 0);
+            //canvesPanel.transform.SetParent(null);
+            //canvesPanel.transform.position = camreferenceObject.transform.position;
+            _check = false;
+        }
+
     }
     public void ButtonsState(bool check)
     {
