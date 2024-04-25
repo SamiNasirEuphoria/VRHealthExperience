@@ -23,6 +23,7 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         //{
             if (!check)
             {
+                SoundManager.Instance.ButtonHover();
                 buttonTransform.DOScale(Vector3.one * 1.05f, 0.75f);
             }
         //}
@@ -41,6 +42,7 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     }
     public void Clicked()
     {
+        SoundManager.Instance.ButtonClick();
         if (!isPlayPause)
         {
             buttonTransform.DOScale(Vector3.one * 1.10f, 0.75f);

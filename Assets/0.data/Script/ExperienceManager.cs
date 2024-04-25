@@ -40,7 +40,8 @@ public class ExperienceManager : MonoBehaviour
     {
         if (InputBridge.Instance.RightTriggerDown && check)
         {
-            CanvesPosition();
+            //CanvesPosition();
+            canvesPanel.SetActive(true);
             StartCoroutine(FadeInScreen());
             check = false;
         }
@@ -51,8 +52,8 @@ public class ExperienceManager : MonoBehaviour
         {
             canvesPanel.transform.SetParent(camreferenceObject.transform);
             canvesPanel.SetActive(true);
-            canvesPanel.transform.position = new Vector3(0, 0, 0);
-            canvesPanel.transform.eulerAngles = new Vector3(0, 0, 0);
+            canvesPanel.transform.localPosition = new Vector3(0, 0, 0);
+            canvesPanel.transform.localEulerAngles = new Vector3(0, 0, 0);
             //canvesPanel.transform.SetParent(null);
             //canvesPanel.transform.position = camreferenceObject.transform.position;
             _check = false;
