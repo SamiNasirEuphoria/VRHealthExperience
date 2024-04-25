@@ -32,13 +32,13 @@ public class SoundManager : MonoBehaviour
     public void ButtonClick()
     {
         myAudio.clip = buttonSound;
-        myAudio.volume = 0.25f;
+        myAudio.volume = 0.45f;
         myAudio.Play();
     }
     public void ButtonHover()
     {
         myAudio.clip = hoverSound;
-        myAudio.volume = 1;
+        myAudio.volume = 0.25f;
         myAudio.Play();
     }
 }
