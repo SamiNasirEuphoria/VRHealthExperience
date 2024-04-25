@@ -10,7 +10,7 @@ public class ExperienceManager : MonoBehaviour
     public MediaPlayer[] videoPlayer;
     public UnityEngine.UI.Button exit, play,pause, rewind;
    
-    public GameObject outerSphere, canvesPanel, camreferenceObject;
+    public GameObject outerSphere, canvesPanel, camreferenceObject, prefab;
     private ApplyToMesh myPlayer;
     public CanvasGroup myGroup;
     public Animator myAnimator;
@@ -38,26 +38,38 @@ public class ExperienceManager : MonoBehaviour
     }
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            DropObjects();
+        }
         if (InputBridge.Instance.RightTriggerDown && check)
         {
             //CanvesPosition();
+            //DropObjects();
             canvesPanel.SetActive(true);
             StartCoroutine(FadeInScreen());
             check = false;
         }
     }
-    public void CanvesPosition()
+    //public void CanvesPosition()
+    //{
+    //    if (_check)
+    //    {
+    //        canvesPanel.transform.SetParent(camreferenceObject.transform);
+    //        canvesPanel.SetActive(true);
+    //        canvesPanel.transform.localPosition = new Vector3(0, 0, 0);
+    //        canvesPanel.transform.localEulerAngles = new Vector3(0, 0, 0);
+    //        //canvesPanel.transform.SetParent(null);
+    //        //canvesPanel.transform.position = camreferenceObject.transform.position;
+    //        _check = false;
+    //    }
+
+    //}
+    public void DropObjects()
     {
-        if (_check)
-        {
-            canvesPanel.transform.SetParent(camreferenceObject.transform);
-            canvesPanel.SetActive(true);
-            canvesPanel.transform.localPosition = new Vector3(0, 0, 0);
-            canvesPanel.transform.localEulerAngles = new Vector3(0, 0, 0);
-            //canvesPanel.transform.SetParent(null);
-            //canvesPanel.transform.position = camreferenceObject.transform.position;
-            _check = false;
-        }
+        GameObject newPlane = Instantiate(prefab, camreferenceObject.transform);
+        // Set the parent of the new GameObject to the parentObject
+        newPlane.transform.parent = null;
 
     }
     public void ButtonsState(bool check)
