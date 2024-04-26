@@ -17,8 +17,8 @@ public class ExperienceManager : MonoBehaviour
     public float startScene, fadeInScreen, fadeOutScreen;
     private bool check, _check;
     public UnityEvent buttonResetState;
-    public UIPointer raycastLine;
-    private GameObject raycast;
+    public UIPointer_ raycastLine;
+    private LineRenderer raycast;
     //private string basicUrl= "/Users/mac/Downloads/";
     private string basicUrl = "/storage/emulated/0/Movies/";
     private void Start()
@@ -35,11 +35,11 @@ public class ExperienceManager : MonoBehaviour
         check = true;
         _check = true;
 
-        if (raycastLine._cursor)
+        if (raycastLine.lineRenderer)
         {
-            raycast = raycastLine._cursor;
+            raycast = raycastLine.lineRenderer;
         }
-        raycast.SetActive(false);
+        raycast.enabled= false;
     }
     private void Update()
     {
@@ -51,6 +51,7 @@ public class ExperienceManager : MonoBehaviour
         {
             //CanvesPosition();
             //DropObjects();
+            raycast.enabled = true;
             canvesPanel.SetActive(true);
             StartCoroutine(FadeInScreen());
             check = false;
@@ -86,7 +87,7 @@ public class ExperienceManager : MonoBehaviour
     }
     IEnumerator FadeInScreen()
     {
-        raycast.SetActive(true);
+        //raycast.enabled = true;
         Debug.Log("Calling screen fade in");
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(myGroup, 1f, fadeInScreen);
@@ -101,10 +102,11 @@ public class ExperienceManager : MonoBehaviour
         yield return FadeScreen(myGroup, 0f, fadeOutScreen);
         canvesPanel.SetActive(false);
         check = true;
-        raycast.SetActive(false);
+        raycast.enabled = false;
     }
     IEnumerator ExitScreen()
     {
+        raycast.enabled = false;
         myAnimator.SetTrigger("FadeIn");
         buttonResetState.Invoke();
         yield return new WaitForSeconds(0.05f);
@@ -132,21 +134,18 @@ public class ExperienceManager : MonoBehaviour
     public void Play()
     {
         StopAllCoroutines();
-        //videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
         videoPlayer.gameObject.SetActive(true);
         StartCoroutine(FadeOutScreen());
     }
     public void Pause()
     {
         StopAllCoroutines();
-        //videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(false);
         videoPlayer.gameObject.SetActive(false);
     }
     public void Rewind()
     {
         StopAllCoroutines();
-        //videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Rewind(true);
-        //videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Play();
+        videoPlayer.gameObject.SetActive(true);
         videoPlayer.Rewind(true);
         videoPlayer.Play();
         StartCoroutine(FadeOutScreen());
