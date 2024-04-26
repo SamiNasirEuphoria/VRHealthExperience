@@ -26,16 +26,7 @@ public class ExperienceManager : MonoBehaviour
         myGroup.alpha = 0;
         canvesPanel.SetActive(false);
         myPlayer = outerSphere.GetComponent<ApplyToMesh>();
-        //myPlayer.enabled = false;
-        //foreach (MediaPlayer player in videoPlayer)
-        //{
-        //    player.gameObject.SetActive(false);
-        //}
-        //meshMedia.Player = videoPlayer[MainmenuManager.modeSelected];
-
         
-
-
         exit.onClick.AddListener(Exit);
         play.onClick.AddListener(Play);
         pause.onClick.AddListener(Pause);
@@ -48,7 +39,7 @@ public class ExperienceManager : MonoBehaviour
         {
             raycast = raycastLine._cursor;
         }
-
+        raycast.SetActive(false);
     }
     private void Update()
     {
@@ -118,7 +109,8 @@ public class ExperienceManager : MonoBehaviour
         buttonResetState.Invoke();
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(myGroup, 0f, fadeOutScreen);
-        SceneHandler.Instance.Load("OpenHealthVR-BackToMenu");
+        MainmenuManager.modeScreenCheck = true;
+        SceneHandler.Instance.Load("OpenHealthVR-Menu");
     }
     IEnumerator FadeScreen(CanvasGroup screen, float targetAlpha, float duration)
     {

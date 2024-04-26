@@ -9,6 +9,7 @@ public class MainmenuManager : MonoBehaviour
     public float timeBetweenScreens = 2f; 
     public float startScene;
     public static int modeSelected;
+    public static bool modeScreenCheck;
     public Animator myAnimator;
     void Start()
     {
@@ -33,7 +34,6 @@ public class MainmenuManager : MonoBehaviour
         UIReferenceContainer.Instance.welcomeScreenButton.onClick.AddListener(WelcomeScreenButton);
         UIReferenceContainer.Instance.introScreenButton.onClick.AddListener(IntroScreenButton);
         UIReferenceContainer.Instance.controllerScreenButton.onClick.AddListener(ControllerScreenButton);
-        //UIReferenceContainer.Instance.modeScreenButton.onClick.AddListener(ModeScreenButton);
 
     }
    
@@ -57,7 +57,15 @@ public class MainmenuManager : MonoBehaviour
     IEnumerator FadeInScreen()
     {
         yield return new WaitForSeconds(startScene);
-        yield return FadeScreen(welcomesScreen, 1f, fadeInDuration);
+        if (!modeScreenCheck)
+        {
+            yield return FadeScreen(welcomesScreen, 1f, fadeInDuration);
+        }
+        else
+        {
+            yield return FadeScreen(modeScreen, 1f, fadeInDuration);
+        }
+       
     }
     IEnumerator FadeOutScreen()
     {
