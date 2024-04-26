@@ -9,7 +9,7 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     private Button button;
     private RectTransform buttonTransform;
     private bool check;
-    public bool isPlayPause;
+    public bool isPlayPause, isVideoButton;
     void Start()
     {
         button = GetComponent<Button>();
@@ -19,30 +19,29 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //if (!isPlayPause)
-        //{
-            if (!check)
-            {
-                SoundManager.Instance.ButtonHover();
-                buttonTransform.DOScale(Vector3.one * 1.05f, 0.75f);
-            }
-        //}
-       
+        if (!check)
+        {
+               
+           buttonTransform.DOScale(Vector3.one * 1.05f, 0.75f);
+        }
+        if (!isVideoButton)
+        {
+            SoundManager.Instance.ButtonHover();
+        }
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        //if (!isPlayPause)
-        //{
             if (!check)
             {
                 buttonTransform.DOScale(Vector3.one, 0.75f);
             }
-        //}
-
     }
     public void Clicked()
     {
-        SoundManager.Instance.ButtonClick();
+        if (!isVideoButton)
+        {
+            SoundManager.Instance.ButtonClick();
+        }
         if (!isPlayPause)
         {
             buttonTransform.DOScale(Vector3.one * 1.10f, 0.75f);

@@ -262,6 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &15154341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -667,6 +668,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &145004446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -981,6 +983,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &183162248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1875,6 +1878,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &1075195853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2045,6 +2049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &1222970219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2332,6 +2337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &1234765308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3088,6 +3094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayPause: 0
+  isVideoButton: 0
 --- !u!114 &1927065727
 MonoBehaviour:
   m_ObjectHideFlags: 0

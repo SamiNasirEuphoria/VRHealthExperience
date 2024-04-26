@@ -22,7 +22,7 @@ namespace BNG {
         public bool AutoUpdateUITransforms = true;
 
         public GameObject cursor;
-        private GameObject _cursor;
+        public GameObject _cursor;
 
         [Tooltip("If true the cursor and LineRenderer will be Hidden. Otherwise it will still be show at a fixed length")]
         public bool HidePointerIfNoObjectsFound = true;

@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class ExperienceManager : MonoBehaviour
 {
     public ApplyToMesh meshMedia;
-    public MediaPlayer[] videoPlayer;
+    public MediaPlayer videoPlayer;
     public UnityEngine.UI.Button exit, play,pause, rewind;
    
     public GameObject outerSphere, canvesPanel, camreferenceObject, prefab;
@@ -17,17 +17,25 @@ public class ExperienceManager : MonoBehaviour
     public float startScene, fadeInScreen, fadeOutScreen;
     private bool check, _check;
     public UnityEvent buttonResetState;
+    public UIPointer raycastLine;
+    private GameObject raycast;
+    //private string basicUrl= "/Users/mac/Downloads/";
+    private string basicUrl = "/storage/emulated/0/Movies/";
     private void Start()
     {
         myGroup.alpha = 0;
         canvesPanel.SetActive(false);
         myPlayer = outerSphere.GetComponent<ApplyToMesh>();
-        myPlayer.enabled = false;
-        foreach (MediaPlayer player in videoPlayer)
-        {
-            player.gameObject.SetActive(false);
-        }
-        meshMedia.Player = videoPlayer[MainmenuManager.modeSelected];
+        //myPlayer.enabled = false;
+        //foreach (MediaPlayer player in videoPlayer)
+        //{
+        //    player.gameObject.SetActive(false);
+        //}
+        //meshMedia.Player = videoPlayer[MainmenuManager.modeSelected];
+
+        
+
+
         exit.onClick.AddListener(Exit);
         play.onClick.AddListener(Play);
         pause.onClick.AddListener(Pause);
@@ -35,13 +43,19 @@ public class ExperienceManager : MonoBehaviour
         StartCoroutine(Wait());
         check = true;
         _check = true;
+
+        if (raycastLine._cursor)
+        {
+            raycast = raycastLine._cursor;
+        }
+
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            DropObjects();
-        }
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    DropObjects();
+        //}
         if (InputBridge.Instance.RightTriggerDown && check)
         {
             //CanvesPosition();
@@ -81,6 +95,7 @@ public class ExperienceManager : MonoBehaviour
     }
     IEnumerator FadeInScreen()
     {
+        raycast.SetActive(true);
         Debug.Log("Calling screen fade in");
         yield return new WaitForSeconds(0.05f);
         yield return FadeScreen(myGroup, 1f, fadeInScreen);
@@ -89,12 +104,13 @@ public class ExperienceManager : MonoBehaviour
     }
     IEnumerator FadeOutScreen()
     {
-            Debug.Log("calling screen fade out");
-            yield return new WaitForSeconds(7.5f);
-            ButtonsState(false);
-            yield return FadeScreen(myGroup, 0f, fadeOutScreen);
-            canvesPanel.SetActive(false);
-            check = true;
+        Debug.Log("calling screen fade out");
+        yield return new WaitForSeconds(7.5f);
+        ButtonsState(false);
+        yield return FadeScreen(myGroup, 0f, fadeOutScreen);
+        canvesPanel.SetActive(false);
+        check = true;
+        raycast.SetActive(false);
     }
     IEnumerator ExitScreen()
     {
@@ -124,19 +140,23 @@ public class ExperienceManager : MonoBehaviour
     public void Play()
     {
         StopAllCoroutines();
-        videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
+        //videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
+        videoPlayer.gameObject.SetActive(true);
         StartCoroutine(FadeOutScreen());
     }
     public void Pause()
     {
         StopAllCoroutines();
-        videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(false);
+        //videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(false);
+        videoPlayer.gameObject.SetActive(false);
     }
     public void Rewind()
     {
         StopAllCoroutines();
-        videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Rewind(true);
-        videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Play();
+        //videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Rewind(true);
+        //videoPlayer[MainmenuManager.modeSelected].GetComponent<MediaPlayer>().Play();
+        videoPlayer.Rewind(true);
+        videoPlayer.Play();
         StartCoroutine(FadeOutScreen());
     }
     IEnumerator Wait()
@@ -145,6 +165,8 @@ public class ExperienceManager : MonoBehaviour
         yield return new WaitForSeconds(0.25f);
         myPlayer.enabled = true;
         yield return new WaitForEndOfFrame();
-        videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
+        videoPlayer.OpenMedia(new MediaPath(basicUrl + "OH_Video_" + MainmenuManager.modeSelected + ".mp4", MediaPathType.AbsolutePathOrURL), autoPlay: true);
+
+        //videoPlayer[MainmenuManager.modeSelected].gameObject.SetActive(true);
     }
 }
