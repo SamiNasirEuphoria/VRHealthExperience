@@ -74,19 +74,37 @@ public class ExperienceManager : MonoBehaviour
     public void DropObjects()
     {
         GameObject newPlane = Instantiate(prefab, camreferenceObject.transform);
-        // Set the parent of the new GameObject to the parentObject
+        
         newPlane.transform.parent = null;
         canvesPanel.transform.position = newPlane.transform.position;
-        //canvesPanel.transform.position = new Vector3(newPlane.transform.position.x, newPlane.transform.position.y, canvesPanel.transform.position.z);
         canvesPanel.transform.rotation = newPlane.transform.rotation;
 
+
+        //testing
         //Vector3 rotation = new Vector3(newPlane.transform.rotation.x, canvesPanel.transform.rotation.y, newPlane.transform.rotation.z);
         //Quaternion _rotation = Quaternion.Euler(rotation);
         //Vector4 Rotation = new Vector4(newPlane.transform.rotation.x, canvesPanel.transform.rotation.y, newPlane.transform.rotation.z, Quaternion.identity);
         //canvesPanel.transform.rotation = _rotation;
         //canvesPanel.transform.eulerAngles =  new Vector3(newPlane.transform.rotation.x, canvesPanel.transform.rotation.y, newPlane.transform.rotation.z ) ;
-
+        //ModifyRotation(newPlane);
     }
+    //public void ModifyRotation(GameObject newPlane)
+    //{
+    //    Quaternion currentRotation = canvesPanel.transform.rotation;
+
+    //    // Extract the Euler angles from the current rotation
+    //    Vector3 currentEulerAngles = currentRotation.eulerAngles;
+
+    //    // Modify the X and Z components of the Euler angles while keeping Y unchanged
+    //    currentEulerAngles.x = newPlane.transform.rotation.x;
+    //    currentEulerAngles.z = canvesPanel.transform.rotation.z;
+    //    currentEulerAngles.y = newPlane.transform.rotation.y;
+    //    // Create a new Quaternion rotation from the modified Euler angles
+    //    Quaternion newRotation = Quaternion.Euler(currentEulerAngles);
+
+    //    // Assign the new rotation back to the GameObject's Transform component
+    //    canvesPanel.transform.rotation = newRotation;
+    //}
     public void ButtonsState(bool check)
     {
         videoSlider.interactable = check;
