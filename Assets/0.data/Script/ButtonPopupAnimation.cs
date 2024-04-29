@@ -20,14 +20,14 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!check)
-        {
-               
+        { 
            buttonTransform.DOScale(Vector3.one * 1.05f, 0.75f);
+            if (!isVideoButton)
+            {
+                SoundManager.Instance.ButtonHover();
+            }
         }
-        if (!isVideoButton)
-        {
-            SoundManager.Instance.ButtonHover();
-        }
+        
     }
     public void OnPointerExit(PointerEventData eventData)
     {

@@ -9,7 +9,7 @@ public class ExperienceManager : MonoBehaviour
     public ApplyToMesh meshMedia;
     public MediaPlayer videoPlayer;
     public UnityEngine.UI.Button exit, play,pause, rewind;
-   
+    public UnityEngine.UI.Slider videoSlider;
     public GameObject outerSphere, canvesPanel, camreferenceObject, prefab;
     private ApplyToMesh myPlayer;
     public CanvasGroup myGroup;
@@ -80,10 +80,12 @@ public class ExperienceManager : MonoBehaviour
     }
     public void ButtonsState(bool check)
     {
+        videoSlider.interactable = check;
         exit.interactable = check;
         play.interactable = check;
         rewind.interactable = check;
         pause.interactable = check;
+        
     }
     IEnumerator FadeInScreen()
     {
@@ -96,8 +98,9 @@ public class ExperienceManager : MonoBehaviour
     }
     IEnumerator FadeOutScreen()
     {
+       
         Debug.Log("calling screen fade out");
-        yield return new WaitForSeconds(7.5f);
+        yield return new WaitForSeconds(8.5f);
         ButtonsState(false);
         yield return FadeScreen(myGroup, 0f, fadeOutScreen);
         canvesPanel.SetActive(false);
@@ -134,18 +137,28 @@ public class ExperienceManager : MonoBehaviour
     public void Play()
     {
         StopAllCoroutines();
-        videoPlayer.gameObject.SetActive(true);
+        videoPlayer.Play();
+        //videoPlayer.gameObject.SetActive(true);
+        StartCoroutine(FadeOutScreen());
+    }
+    public void VideoForwardStart()
+    {
+        StopAllCoroutines();
+    }
+    public void VideoForwardStop()
+    {
         StartCoroutine(FadeOutScreen());
     }
     public void Pause()
     {
         StopAllCoroutines();
-        videoPlayer.gameObject.SetActive(false);
+        //videoPlayer.gameObject.SetActive(false);
+        videoPlayer.Pause();
     }
     public void Rewind()
     {
         StopAllCoroutines();
-        videoPlayer.gameObject.SetActive(true);
+        //videoPlayer.gameObject.SetActive(true);
         videoPlayer.Rewind(true);
         videoPlayer.Play();
         StartCoroutine(FadeOutScreen());
