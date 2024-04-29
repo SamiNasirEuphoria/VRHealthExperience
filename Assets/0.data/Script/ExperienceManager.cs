@@ -80,6 +80,12 @@ public class ExperienceManager : MonoBehaviour
         //canvesPanel.transform.position = new Vector3(newPlane.transform.position.x, newPlane.transform.position.y, canvesPanel.transform.position.z);
         canvesPanel.transform.rotation = newPlane.transform.rotation;
 
+        //Vector3 rotation = new Vector3(newPlane.transform.rotation.x, canvesPanel.transform.rotation.y, newPlane.transform.rotation.z);
+        //Quaternion _rotation = Quaternion.Euler(rotation);
+        //Vector4 Rotation = new Vector4(newPlane.transform.rotation.x, canvesPanel.transform.rotation.y, newPlane.transform.rotation.z, Quaternion.identity);
+        //canvesPanel.transform.rotation = _rotation;
+        //canvesPanel.transform.eulerAngles =  new Vector3(newPlane.transform.rotation.x, canvesPanel.transform.rotation.y, newPlane.transform.rotation.z ) ;
+
     }
     public void ButtonsState(bool check)
     {

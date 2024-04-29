@@ -38,10 +38,8 @@ public class ButtonPopupAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     }
     public void Clicked()
     {
-        if (!isVideoButton)
-        {
-            SoundManager.Instance.ButtonClick();
-        }
+       
+        SoundManager.Instance.ButtonClick();
         if (!isPlayPause)
         {
             buttonTransform.DOScale(Vector3.one * 1.10f, 0.75f);
