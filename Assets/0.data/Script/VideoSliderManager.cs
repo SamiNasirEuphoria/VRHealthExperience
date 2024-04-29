@@ -10,6 +10,7 @@ public class VideoSliderManager : MonoBehaviour
 	private bool _isHoveringOverTimeline, _wasPlayingBeforeTimelineDrag;
 	private TimeRange timelineRange;
 	public ExperienceManager manager;
+	public ToggleButton toggleButton;
 	private void Start()
     {
 		CreateTimelineDragEvents();
@@ -107,6 +108,7 @@ public class VideoSliderManager : MonoBehaviour
 			//newly added line
 			_mediaPlayer.Play();
 			manager.VideoForwardStop();
+			toggleButton.ResetScene();
 			Debug.Log("Value changing");
 		}
 	}

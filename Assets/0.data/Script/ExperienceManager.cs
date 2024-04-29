@@ -50,7 +50,7 @@ public class ExperienceManager : MonoBehaviour
         if (InputBridge.Instance.RightTriggerDown && check)
         {
             //CanvesPosition();
-            //DropObjects();
+            DropObjects();
             raycast.enabled = true;
             canvesPanel.SetActive(true);
             StartCoroutine(FadeInScreen());
@@ -76,6 +76,9 @@ public class ExperienceManager : MonoBehaviour
         GameObject newPlane = Instantiate(prefab, camreferenceObject.transform);
         // Set the parent of the new GameObject to the parentObject
         newPlane.transform.parent = null;
+        canvesPanel.transform.position = newPlane.transform.position;
+        //canvesPanel.transform.position = new Vector3(newPlane.transform.position.x, newPlane.transform.position.y, canvesPanel.transform.position.z);
+        canvesPanel.transform.rotation = newPlane.transform.rotation;
 
     }
     public void ButtonsState(bool check)
@@ -102,7 +105,7 @@ public class ExperienceManager : MonoBehaviour
         Debug.Log("calling screen fade out");
         yield return new WaitForSeconds(8.5f);
         ButtonsState(false);
-        yield return FadeScreen(myGroup, 0f, fadeOutScreen);
+        yield return FadeScreen(myGroup, 0f, 1.55f);
         canvesPanel.SetActive(false);
         check = true;
         raycast.enabled = false;
