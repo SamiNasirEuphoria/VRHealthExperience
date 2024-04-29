@@ -95,7 +95,7 @@ public class ExperienceManager : MonoBehaviour
         //raycast.enabled = true;
         Debug.Log("Calling screen fade in");
         yield return new WaitForSeconds(0.05f);
-        yield return FadeScreen(myGroup, 1f, fadeInScreen);
+        yield return FadeScreen(myGroup, 1f, 1.25f);
         ButtonsState(true);
         StartCoroutine(FadeOutScreen());
     }
@@ -105,7 +105,7 @@ public class ExperienceManager : MonoBehaviour
         Debug.Log("calling screen fade out");
         yield return new WaitForSeconds(8.5f);
         ButtonsState(false);
-        yield return FadeScreen(myGroup, 0f, 1.55f);
+        yield return FadeScreen(myGroup, 0f, 1.25f);
         canvesPanel.SetActive(false);
         check = true;
         raycast.enabled = false;

@@ -108,7 +108,7 @@ public class VideoSliderManager : MonoBehaviour
 			//newly added line
 			_mediaPlayer.Play();
 			manager.VideoForwardStop();
-			toggleButton.ResetScene();
+			toggleButton.ToggleButton1();
 			Debug.Log("Value changing");
 		}
 	}

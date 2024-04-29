@@ -24,7 +24,7 @@ public class ToggleButton : MonoBehaviour
         buttonPlay.image.sprite = selectedSpritePlay;
         buttonPause.image.sprite = normalSpritePause;
     }
-    void ToggleButton1()
+    public void ToggleButton1()
     {
         buttonPlay.image.sprite = selectedSpritePlay;
         buttonPause.image.sprite = normalSpritePause;
