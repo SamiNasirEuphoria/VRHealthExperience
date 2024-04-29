@@ -16,6 +16,9 @@
 #if (!UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN) && (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_TVOS || UNITY_ANDROID)
 	#define UNITY_PLATFORM_SUPPORTS_VIDEOTRANSFORM
 #endif
+#if (UNITY_EDITOR_WIN || (!UNITY_EDITOR && UNITY_STANDALONE_WIN))
+	#define UNITY_PLATFORM_SUPPORTS_VIDEOASPECTRATIO
+#endif
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -101,10 +104,8 @@ namespace RenderHeads.Media.AVProVideo
 		private Texture _lastTexture;
 		private static Shader _shaderStereoPacking;
 		private static Shader _shaderAlphaPacking;
-#if (!UNITY_EDITOR && UNITY_ANDROID)
 		private static Shader _shaderAndroidOES;
 		private static Shader _shaderAndroidOESAlphaPacking;
-#endif
 
 		private bool _isUserMaterial = true;
 		private Material _material;
@@ -177,7 +178,7 @@ namespace RenderHeads.Media.AVProVideo
 
 		private static Shader EnsureAlphaPackingShader()
 		{
-			_shaderAlphaPacking = EnsureShader(_shaderAlphaPacking, "AVProVideo/Internal/UI/Transparent Packed");
+			_shaderAlphaPacking = EnsureShader(_shaderAlphaPacking, "AVProVideo/Internal/UI/Transparent Packed (stereo)");
 			return _shaderAlphaPacking;
 		}
 
@@ -187,19 +188,17 @@ namespace RenderHeads.Media.AVProVideo
 			return _shaderStereoPacking;
 		}
 
-#if (!UNITY_EDITOR && UNITY_ANDROID)
 		private Shader EnsureAndroidOESShader()
 		{
-			_shaderAndroidOES = EnsureShader(_shaderAndroidOES, "AVProVideo/Internal/UI/AndroidOES");
+			_shaderAndroidOES = EnsureShader(_shaderAndroidOES, "AVProVideo/Internal/UI/Stereo - AndroidOES");
 			return _shaderAndroidOES;
 		}
 
 		private static Shader EnsureAndroidOESAlphaPackingShader()
 		{
-			_shaderAndroidOESAlphaPacking = EnsureShader(_shaderAndroidOESAlphaPacking, "AVProVideo/Internal/UI/Transparent Packed - AndroidOES");
+			_shaderAndroidOESAlphaPacking = EnsureShader(_shaderAndroidOESAlphaPacking, "AVProVideo/Internal/UI/Transparent Packed (stereo) - AndroidOES");
 			return _shaderAndroidOESAlphaPacking;
 		}		
-#endif
 
 		protected override void Start()
 		{
@@ -277,8 +276,8 @@ namespace RenderHeads.Media.AVProVideo
 				result = EnsureAlphaPackingShader();
 			}
 
-#if (!UNITY_EDITOR && UNITY_ANDROID)
-			if (_mediaPlayer.PlatformOptionsAndroid.useFastOesPath)
+//			if (_mediaPlayer.TextureProducer != null && _mediaPlayer.IsUsingAndroidOESPath() && (_defaultTexture == null || _lastTexture != _defaultTexture ))
+			if (_mediaPlayer.TextureProducer != null && _mediaPlayer.IsUsingAndroidOESPath())
 			{
 				// This shader handles stereo too
 				result = EnsureAndroidOESShader();
@@ -297,7 +296,7 @@ namespace RenderHeads.Media.AVProVideo
 						break;
 				}
 			}
-#endif
+
 			return result;
 		}
 
@@ -607,6 +606,23 @@ namespace RenderHeads.Media.AVProVideo
 						textureSize = m.MultiplyVector(textureSize);
 						textureSize.x = Mathf.Abs(textureSize.x);
 						textureSize.y = Mathf.Abs(textureSize.y);
+					}
+#endif
+#if UNITY_PLATFORM_SUPPORTS_VIDEOASPECTRATIO
+					if (HasValidTexture())
+					{
+						float par = _mediaPlayer.TextureProducer.GetTexturePixelAspectRatio();
+						if (par > 0f)
+						{
+							if (par > 1f)
+							{
+								textureSize.x *= par;
+							}
+							else
+							{
+								textureSize.y /= par;
+							}
+						}
 					}
 #endif
 					// Adjust textureSize based on alpha/stereo packing

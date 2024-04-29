@@ -20,10 +20,20 @@ namespace RenderHeads.Media.AVProVideo.Editor
 			new GUIContent("Facebook Audio 360", "Initialises player with Facebook Audio 360 support"),
 		};
 
+		private readonly static GUIContent[] _blitTextureFilteringAndroid =
+		{
+			new GUIContent("Point"),
+			new GUIContent("Bilinear"),
+			new GUIContent("Trilinear"),
+		};
+
 		private readonly static FieldDescription _optionFileOffset = new FieldDescription(".fileOffset", GUIContent.none);
 		private readonly static FieldDescription _optionUseFastOesPath = new FieldDescription(".useFastOesPath", new GUIContent("Use OES Rendering", "Enables a faster rendering path using OES textures.  This requires that all rendering in Unity uses special GLSL shaders."));
+		private readonly static FieldDescription _optionBlitTextureFiltering = new FieldDescription(".blitTextureFiltering", new GUIContent("Blit Texture Filtering", "The texture filtering used for the final internal blit."));
 		private readonly static FieldDescription _optionShowPosterFrames = new FieldDescription(".showPosterFrame", new GUIContent("Show Poster Frame", "Allows a paused loaded video to display the initial frame. This uses up decoder resources."));
 		private readonly static FieldDescription _optionPreferSoftwareDecoder = new FieldDescription(".preferSoftwareDecoder", GUIContent.none);
+		private readonly static FieldDescription _optionForceRtpTCP = new FieldDescription(".forceRtpTCP", GUIContent.none);
+		private readonly static FieldDescription _optionForceEnableMediaCodecAsyncQueueing = new FieldDescription(".forceEnableMediaCodecAsyncQueueing", GUIContent.none);
 		private readonly static FieldDescription _optionPreferredMaximumResolution = new FieldDescription("._preferredMaximumResolution", new GUIContent("Preferred Maximum Resolution", "The desired maximum resolution of the video."));
 #if UNITY_2017_2_OR_NEWER
 		private readonly static FieldDescription _optionCustomPreferredMaxResolution = new FieldDescription("._customPreferredMaximumResolution", new GUIContent(" "));
@@ -76,6 +86,11 @@ namespace RenderHeads.Media.AVProVideo.Editor
 					}
 				}
 
+				{
+					SerializedProperty propBlitTextureFiltering = DisplayPlatformOptionEnum(optionsVarName, _optionBlitTextureFiltering, _blitTextureFilteringAndroid);
+					propBlitTextureFiltering.intValue = Mathf.Max(0, propBlitTextureFiltering.intValue);
+				}
+
 				EditorGUILayout.EndVertical();
 			}
 
@@ -85,6 +100,12 @@ namespace RenderHeads.Media.AVProVideo.Editor
 				if (httpHeadersProp != null)
 				{
 					OnInspectorGUI_HttpHeaders(httpHeadersProp);
+				}
+
+				SerializedProperty keyAuthProp = serializedObject.FindProperty(optionsVarName + ".keyAuth");
+				if (keyAuthProp != null)
+				{
+					OnInspectorGUI_HlsDecryption(keyAuthProp);
 				}
 			}
 
@@ -104,6 +125,8 @@ namespace RenderHeads.Media.AVProVideo.Editor
 				GUILayout.Label("ExoPlayer API Options", EditorStyles.boldLabel);
 
 				DisplayPlatformOption(optionsVarName, _optionPreferSoftwareDecoder);
+				DisplayPlatformOption(optionsVarName, _optionForceRtpTCP);
+				DisplayPlatformOption(optionsVarName, _optionForceEnableMediaCodecAsyncQueueing);
 
 				// Audio
 				{
@@ -115,6 +138,7 @@ namespace RenderHeads.Media.AVProVideo.Editor
 							EditorGUILayout.Space();
 							EditorGUILayout.LabelField("Facebook Audio 360", EditorStyles.boldLabel);
 							DisplayPlatformOptionEnum(optionsVarName, _optionAudio360ChannelMode, _audio360ChannelMapGuiNames);
+							DisplayPlatformOption(optionsVarName, _optionAudio360LatencyMS);
 						}
 					}
 				}

@@ -27,6 +27,7 @@
 			#pragma multi_compile __ APPLY_GAMMA
 			#pragma multi_compile __ USING_DEFAULT_TEXTURE
 			#pragma multi_compile __ STEREO_DEBUG
+			#pragma multi_compile __ USING_URP
 
 			#extension GL_OES_EGL_image_external : require
 			#extension GL_OES_EGL_image_external_essl3 : enable
@@ -43,7 +44,7 @@
 		
 			varying vec2 texVal;
 			uniform vec4 _MainTex_ST;
-			uniform mat4 _TextureMatrix;
+			uniform mat4 _MainTex_Xfrm;
 
 #if defined(STEREO_DEBUG)
 			varying vec4 tint;
@@ -68,12 +69,19 @@
 
 			void main()
 			{
+#if defined(STEREO_MULTIVIEW_ON)
+				int eyeIndex = SetupStereoEyeIndex();
+				mat4 vpMatrix = GetStereoMatrixVP(eyeIndex);
+				gl_Position = vpMatrix * unity_ObjectToWorld * gl_Vertex;
+#else
 				gl_Position = XFormObjectToClip(gl_Vertex);
+#endif
+
 				texVal = transformTex(gl_MultiTexCoord0, _MainTex_ST);
 				//texVal.x = 1.0 - texVal.x;
 
 				// Apply texture transformation matrix - adjusts for offset/cropping (when the decoder decodes in blocks that overrun the video frame size, it pads)
-				texVal.xy = (_TextureMatrix * vec4(texVal.x, texVal.y, 0.0, 1.0) ).xy;
+				texVal.xy = (_MainTex_Xfrm * vec4(texVal.x, texVal.y, 0.0, 1.0) ).xy;
 
 #if defined(STEREO_TOP_BOTTOM) || defined(STEREO_LEFT_RIGHT)
 				vec4 scaleOffset = GetStereoScaleOffset(Android_IsStereoEyeLeft(), false);

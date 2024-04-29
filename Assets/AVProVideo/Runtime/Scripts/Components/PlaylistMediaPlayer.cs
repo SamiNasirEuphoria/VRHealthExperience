@@ -20,6 +20,7 @@ namespace RenderHeads.Media.AVProVideo
 				//Texture2D,
 			}
 
+			[SerializeField] public string name = string.Empty;
 			[SerializeField] public SourceType sourceType = SourceType.AVProVideoPlayer;
 			[SerializeField] public MediaPath mediaPath = new MediaPath();
 			[SerializeField] public Texture2D texture = null;
@@ -189,11 +190,17 @@ namespace RenderHeads.Media.AVProVideo
 		/// </summary>
 		public bool AutoProgress { get { return _playlistAutoProgress; } set { _playlistAutoProgress = value; } }
 
+		/// <summary>
+		/// Returns the IMediaInfo interface for the MediaPlayer that is playing the current active item in the playlist (returned by CurrentPlayer property).  This will change during each transition.
+		/// </summary>
 		public override IMediaInfo Info
 		{
 			get { if (CurrentPlayer != null) return CurrentPlayer.Info; return null; }
 		}
 
+		/// <summary>
+		/// Returns the IMediaControl interface for the MediaPlayer that is playing the current active item in the playlist (returned by CurrentPlayer property).  This will change during each transition.
+		/// </summary>
 		public override IMediaControl Control
 		{
 			get { if (CurrentPlayer != null) return CurrentPlayer.Control; return null; }
@@ -243,7 +250,7 @@ namespace RenderHeads.Media.AVProVideo
 			}
 			if (IsTransitioning())
 			{
-				if (NextPlayer.Control != null)
+				if (!_pausePreviousOnTransition && NextPlayer.Control != null)
 				{
 					NextPlayer.Control.Play();
 				}
@@ -687,6 +694,11 @@ namespace RenderHeads.Media.AVProVideo
 			return CurrentPlayer.TextureProducer.GetTextureTimeStamp();
 		}
 
+		public float GetTexturePixelAspectRatio()
+		{
+			return CurrentPlayer.TextureProducer.GetTexturePixelAspectRatio();
+		}
+
 		public bool RequiresVerticalFlip()
 		{
 			return CurrentPlayer.TextureProducer.RequiresVerticalFlip();
@@ -711,6 +723,17 @@ namespace RenderHeads.Media.AVProVideo
 		{
 			return CurrentPlayer.TextureProducer.GetTextureAlphaPacking();
 		}
+
+		public float[] GetAffineTransform()
+		{
+			return CurrentPlayer.TextureProducer.GetAffineTransform();
+		}
+
+		public Matrix4x4 GetTextureMatrix()
+		{
+			return CurrentPlayer.TextureProducer.GetTextureMatrix();
+		}
+
 #endregion Implementing ITextureProducer
 
 		private static string GetTransitionName(Transition transition)

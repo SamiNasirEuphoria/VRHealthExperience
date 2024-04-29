@@ -56,21 +56,79 @@ namespace RenderHeads.Media.AVProVideo
 
 		[FormerlySerializedAs("m_Loop")]
 		[SerializeField] bool _loop = false;
-		public bool Loop { get { return _loop; } set { _loop = value; if (_controlInterface != null) _controlInterface.SetLooping(_loop); } }
+		public bool Loop
+		{
+			get
+			{
+				return (_controlInterface != null) ? _controlInterface.IsLooping() : _loop;
+			}
+			
+			set
+			{
+				_loop = value;
+				if (_controlInterface != null)
+					_controlInterface.SetLooping(_loop);
+			}
+		}
 
 		[FormerlySerializedAs("m_Volume")]
 		[Range(0.0f, 1.0f)]
 		[SerializeField] float _audioVolume = 1.0f;
-		public virtual float AudioVolume { get { return _audioVolume; } set { _audioVolume = Mathf.Clamp01(value); if (_controlInterface != null) _controlInterface.SetVolume(_audioVolume); } }
+		public virtual float AudioVolume
+		{
+			get
+			{
+				return (_controlInterface != null) ? _controlInterface.GetVolume() : _audioVolume;
+			}
+			
+			set
+			{
+				_audioVolume = Mathf.Clamp01(value);
+				if (_controlInterface != null)
+					_controlInterface.SetVolume(_audioVolume);
+			}
+		}
 
 		[FormerlySerializedAs("m_Balance")]
 		[Range(-1.0f, 1.0f)]
 		[SerializeField] float _audioBalance = 0.0f;
-		public float AudioBalance { get { return _audioBalance; } set { _audioBalance = Mathf.Clamp(value, -1f, 1f); if (_controlInterface != null) _controlInterface.SetBalance(_audioBalance); } }
+		public float AudioBalance
+		{
+			get
+			{
+				return (_controlInterface != null) ? _controlInterface.GetBalance() : _audioBalance;
+			}
+			
+			set
+			{
+				_audioBalance = Mathf.Clamp(value, -1f, 1f);
+				if (_controlInterface != null)
+					_controlInterface.SetBalance(_audioBalance);
+			}
+		}
 
 		[FormerlySerializedAs("m_Muted")]
 		[SerializeField] bool _audioMuted = false;
-		public virtual bool AudioMuted { get { return _audioMuted; } set { _audioMuted = value; if (_controlInterface != null) _controlInterface.MuteAudio(_audioMuted); } }
+		public virtual bool AudioMuted 
+		{
+			get
+			{
+				return (_controlInterface != null) ? _controlInterface.IsMuted() : _audioMuted;
+			}
+			
+			set
+			{
+				_audioMuted = value;
+				if (_controlInterface != null)
+				{
+					#if !UNITY_EDITOR
+						_controlInterface.MuteAudio(_audioMuted);
+					#else
+						_controlInterface.MuteAudio(_audioMuted || UnityEditor.EditorUtility.audioMasterMute);
+					#endif
+				}
+			}
+		}
 
 		private AudioSource _audioSource = null;
 		public AudioSource AudioSource { get { return _audioSource; } internal set { _audioSource = value; } }
@@ -78,7 +136,20 @@ namespace RenderHeads.Media.AVProVideo
 		[FormerlySerializedAs("m_PlaybackRate")]
 		[Range(-4.0f, 4.0f)]
 		[SerializeField] float _playbackRate = 1.0f;
-		public float PlaybackRate { get { return _playbackRate; } set { _playbackRate = value; if (_controlInterface != null) _controlInterface.SetPlaybackRate(_playbackRate); } }
+		public float PlaybackRate
+		{
+			get
+			{
+				return (_controlInterface != null) ? _controlInterface.GetPlaybackRate() : _playbackRate;
+			}
+			
+			set
+			{
+				_playbackRate = value;
+				if (_controlInterface != null)
+					_controlInterface.SetPlaybackRate(_playbackRate);
+			}
+		}
 
 		// Resampler
 
@@ -106,28 +177,94 @@ namespace RenderHeads.Media.AVProVideo
 
 		[FormerlySerializedAs("m_FilterMode")]
 		[SerializeField] FilterMode _textureFilterMode = FilterMode.Bilinear;
-		public FilterMode TextureFilterMode { get { return _textureFilterMode; } set { _textureFilterMode = value; if (_controlInterface != null) _controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel); } }
+		public FilterMode TextureFilterMode
+		{
+			get
+			{
+				if (_controlInterface != null)
+				{
+					FilterMode filterMode = FilterMode.Point;
+					TextureWrapMode textureWrapMode = TextureWrapMode.Repeat;
+					int anisoLevel = 0;
+					_controlInterface.GetTextureProperties(out filterMode, out textureWrapMode, out anisoLevel);
+					return filterMode;
+				}
+				else
+					return _textureFilterMode;
+			}
+			
+			set
+			{
+				_textureFilterMode = value;
+				if (_controlInterface != null)
+					_controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel);
+			}
+		}
 
 		[FormerlySerializedAs("m_WrapMode")]
 		[SerializeField] TextureWrapMode _textureWrapMode = TextureWrapMode.Clamp;
-		public TextureWrapMode TextureWrapMode { get { return _textureWrapMode; } set { _textureWrapMode = value; if (_controlInterface != null) _controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel); } }
+		public TextureWrapMode TextureWrapMode
+		{
+			get
+			{
+				if (_controlInterface != null)
+				{
+					FilterMode filterMode = FilterMode.Point;
+					TextureWrapMode textureWrapMode = TextureWrapMode.Repeat;
+					int anisoLevel = 0;
+					_controlInterface.GetTextureProperties(out filterMode, out textureWrapMode, out anisoLevel);
+					return textureWrapMode;
+				}
+				else
+					return _textureWrapMode;
+			}
+			
+			set
+			{
+				_textureWrapMode = value;
+				if (_controlInterface != null)
+					_controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel);
+			}
+		}
 
 		[FormerlySerializedAs("m_AnisoLevel")]
 		[Range(0, 16)]
 		[SerializeField] int _textureAnisoLevel = 0;
-		public int TextureAnisoLevel { get { return _textureAnisoLevel; } set { _textureAnisoLevel = value; if (_controlInterface != null) _controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel); } }
+		public int TextureAnisoLevel
+		{
+			get
+			{
+				if (_controlInterface != null)
+				{
+					FilterMode filterMode = FilterMode.Point;
+					TextureWrapMode textureWrapMode = TextureWrapMode.Repeat;
+					int anisoLevel = 0;
+					_controlInterface.GetTextureProperties(out filterMode, out textureWrapMode, out anisoLevel);
+					return anisoLevel;
+				}
+				else
+					return _textureAnisoLevel;
+			}
 
+			set
+			{
+				_textureAnisoLevel = value;
+				if (_controlInterface != null)
+					_controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel);
+			}
+		}
+
+#if AVPRO_FEATURE_VIDEORESOLVE
 		[SerializeField] bool _useVideoResolve = false;
 		public bool UseVideoResolve { get { return _useVideoResolve; } set { _useVideoResolve = value; } }
 
 		[SerializeField] VideoResolveOptions _videoResolveOptions = VideoResolveOptions.Create();
 		public VideoResolveOptions VideoResolveOptions { get { return _videoResolveOptions; } set { _videoResolveOptions = value; } }
 
-#if AVPRO_FEATURE_VIDEORESOLVE
 		[SerializeField] VideoResolve _videoResolve = new VideoResolve();
 #endif
-		// Sideloaded subtitles
 
+		// Sideloaded subtitles
 		[FormerlySerializedAs("m_LoadSubtitles")]
 		[SerializeField] bool _sideloadSubtitles;
 		public bool SideloadSubtitles { get { return _sideloadSubtitles; } set { _sideloadSubtitles = value; } }
@@ -236,6 +373,7 @@ namespace RenderHeads.Media.AVProVideo
 
 		// Global init
 		private static bool s_GlobalStartup = false;
+		private static bool s_TrialVersion = false;
 
 		// Subtitle state
 		private MediaPath _queueSubtitlePath;
@@ -292,6 +430,8 @@ namespace RenderHeads.Media.AVProVideo
 				{
 					Debug.LogError("[AVProVideo] Plugin version number " + nativePluginVersion + " doesn't match the expected version number " + expectedNativePluginVersion + ".  It looks like the plugin didn't upgrade correctly.  To resolve this please restart Unity and try to upgrade the package again.");
 				}
+
+				s_TrialVersion = nativePluginVersion.Contains("-trial");
 
 				if (!s_GlobalStartup)
 				{
@@ -520,7 +660,11 @@ namespace RenderHeads.Media.AVProVideo
 				_controlInterface.SetPlaybackRate(_playbackRate);
 				_controlInterface.SetVolume(_audioVolume);
 				_controlInterface.SetBalance(_audioBalance);
+				#if !UNITY_EDITOR
 				_controlInterface.MuteAudio(_audioMuted);
+				#else
+				_controlInterface.MuteAudio(_audioMuted || UnityEditor.EditorUtility.audioMasterMute);
+				#endif
 				_controlInterface.SetTextureProperties(_textureFilterMode, _textureWrapMode, _textureAnisoLevel);
 			}
 		}
@@ -637,6 +781,7 @@ namespace RenderHeads.Media.AVProVideo
 			if (_playerInterface != null)
 			{
 				Update();
+				_playerInterface.BeginRender();
 				_playerInterface.Render();
 				return true;
 			}
@@ -694,6 +839,12 @@ namespace RenderHeads.Media.AVProVideo
 		private void LateUpdate()
 		{
 			UpdateResampler();
+
+			// RJT TODO: Better location?
+			if (_playerInterface != null)
+			{
+				_playerInterface.BeginRender();
+			}
 		}
 
 		private void UpdateResampler()
@@ -1273,6 +1424,15 @@ namespace RenderHeads.Media.AVProVideo
 			}
 		}
 
+		public bool IsUsingAndroidOESPath()
+		{
+			// Android OES mode is not available in the trial
+			bool result = (PlatformOptionsAndroid.useFastOesPath && !s_TrialVersion);
+			#if (UNITY_EDITOR || !UNITY_ANDROID)
+			result = false;
+			#endif
+			return result;
+		}
 
 #region Save Frame To PNG
 #if UNITY_EDITOR || (!UNITY_EDITOR && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX))

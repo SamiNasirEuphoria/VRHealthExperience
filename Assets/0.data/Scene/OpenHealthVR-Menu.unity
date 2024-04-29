@@ -3811,6 +3811,7 @@ MonoBehaviour:
   ControllerSide: 1
   AutoUpdateUITransforms: 1
   cursor: {fileID: 2255670627275077591, guid: cda3e347c37ecf24e89b8cd380c7f9f2, type: 3}
+  _cursor: {fileID: 0}
   HidePointerIfNoObjectsFound: 1
   FixedPointerLength: 0.5
   CursorScaling: 1

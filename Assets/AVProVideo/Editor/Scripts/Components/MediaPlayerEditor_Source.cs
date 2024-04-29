@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 
 //-----------------------------------------------------------------------------
 // Copyright 2015-2021 RenderHeads Ltd.  All rights reserved.
@@ -16,7 +15,7 @@ namespace RenderHeads.Media.AVProVideo.Editor
 #if UNITY_EDITOR_OSX
 		internal const string MediaFileExtensions = "mp4,m4v,mov,mpg,avi,mp3,m4a,aac,ac3,au,aiff,caf,wav,m3u8";
 #else
-		internal const string MediaFileExtensions = "Media Files;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.ts;*.webm;*.flv;*.vob;*.ogg;*.ogv;*.mpg;*.wmv;*.3gp;Audio Files;*wav;*.mp3;*.mp2;*.m4a;*.wma;*.aac;*.au;*.flac;*.m3u8;*.mpd;*.ism;";
+		internal const string MediaFileExtensions = "Media Files;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.ts;*.webm;*.flv;*.vob;*.ogg;*.ogv;*.mpg;*.wmv;*.3gp;*.mxf;Audio Files;*wav;*.mp3;*.mp2;*.m4a;*.wma;*.aac;*.au;*.flac;*.m3u8;*.mpd;*.ism;";
 #endif
 
 		private readonly static GUIContent[] _fileFormatGuiNames =
@@ -200,11 +199,13 @@ namespace RenderHeads.Media.AVProVideo.Editor
 			}
 			else
 			{
-				bool isPlatformAndroid = (platform == Platform.Android) || (platform == Platform.Unknown && BuildTargetGroup.Android == UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
+				bool isPlatformAndroid = platform == Platform.Android;
+				isPlatformAndroid |= (platform == Platform.Unknown && BuildTargetGroup.Android == UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
+				
 				bool isPlatformIOS = (platform == Platform.iOS);
 				isPlatformIOS |= (platform == Platform.Unknown && BuildTargetGroup.iOS == UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
+				
 				bool isPlatformTVOS = (platform == Platform.tvOS);
-
 				isPlatformTVOS |= (platform == Platform.Unknown && BuildTargetGroup.tvOS == UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
 
 				// Test file extensions
@@ -248,12 +249,19 @@ namespace RenderHeads.Media.AVProVideo.Editor
 					else
 					{
 						// Display warning to iOS users if they're trying to use HTTP url without setting the permission
-						if (isPlatformIOS || isPlatformTVOS)
+						if ((isPlatformIOS || isPlatformTVOS) && fullPath.StartsWith("http://"))
 						{
-							if (!PlayerSettings.iOS.allowHTTPDownload && fullPath.StartsWith("http://"))
+							#if UNITY_2022_1_OR_NEWER
+							if (PlayerSettings.insecureHttpOption != InsecureHttpOption.AlwaysAllowed)
 							{
-								EditorHelper.IMGUI.NoticeBox(MessageType.Warning, "Starting with iOS 9 'allow HTTP downloads' must be enabled for HTTP connections (see Player Settings)");
+								EditorHelper.IMGUI.NoticeBox(MessageType.Warning, "PlayerSettings.insecureHttpOption must be enabled for HTTP connections (see Player Settings)");
 							}
+							#else
+							if (!PlayerSettings.iOS.allowHTTPDownload)
+							{
+								EditorHelper.IMGUI.NoticeBox(MessageType.Warning, "PlayerSettings.iOS.allowHTTPDownload must be enabled for HTTP connections (see Player Settings)");
+							}
+							#endif
 						}
 #if UNITY_ANDROID
 						if (fullPath.StartsWith("http://"))
@@ -297,7 +305,8 @@ namespace RenderHeads.Media.AVProVideo.Editor
 
 					if (platform == Platform.Unknown || platform == MediaPlayer.GetPlatform())
 					{
-						if (!System.IO.File.Exists(fullPath))
+						bool fileExists = System.IO.File.Exists(fullPath);
+						if (!fileExists)
 						{
 							EditorHelper.IMGUI.NoticeBox(MessageType.Error, "File not found");
 						}
@@ -307,18 +316,29 @@ namespace RenderHeads.Media.AVProVideo.Editor
 							// This approach is very slow, so we only run it when the app isn't playing
 							if (!Application.isPlaying)
 							{
-								string comparePath = fullPath.Replace('\\', '/');
-								string folderPath = System.IO.Path.GetDirectoryName(comparePath);
-								if (!string.IsNullOrEmpty(folderPath))
+								string folderPath = System.IO.Path.GetDirectoryName(fullPath);
+								// Skip empty paths and network shares
+								if (!string.IsNullOrEmpty(folderPath) && !folderPath.StartsWith("\\\\"))
 								{
-
-									string[] files = System.IO.Directory.GetFiles(folderPath, "*", System.IO.SearchOption.TopDirectoryOnly);
+									string[] files;
 									bool caseMatch = false;
+									try
+									{
+										files = System.IO.Directory.GetFiles(folderPath, "*", System.IO.SearchOption.TopDirectoryOnly);
+									}
+									catch
+									{
+										// Directory.GetFiles can fail if the folder path cannot be resolved such as if it is a network share
+										files = null;
+										caseMatch = true;
+									}
 									if (files != null && files.Length > 0)
 									{
 										for (int i = 0; i < files.Length; i++)
 										{
-											if (files[i].Replace('\\', '/') == comparePath)
+											string filePath = System.IO.Path.Combine(folderPath, files[i]);
+											filePath = filePath.Replace('\\', '/');
+											if (filePath == fullPath)
 											{
 												caseMatch = true;
 												break;

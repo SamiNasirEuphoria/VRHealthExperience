@@ -14,6 +14,7 @@ namespace RenderHeads.Media.AVProVideo
 		void OnEnable();
 		void Update();
 		void EndUpdate();
+		void BeginRender();
 		void Render();
 		IntPtr GetNativePlayerHandle();
 	}
@@ -193,6 +194,7 @@ namespace RenderHeads.Media.AVProVideo
 		long						GetLastExtendedErrorCode();
 
 		void						SetTextureProperties(FilterMode filterMode = FilterMode.Bilinear, TextureWrapMode wrapMode = TextureWrapMode.Clamp, int anisoLevel = 1);
+		void						GetTextureProperties(out FilterMode filterMode, out TextureWrapMode wrapMode, out int anisoLevel);
 
 		// Audio Grabbing
 
@@ -205,6 +207,8 @@ namespace RenderHeads.Media.AVProVideo
 		int							GetAudioBufferedSampleCount();
 		int							GetAudioChannelCount();
 		AudioChannelMaskFlags		GetAudioChannelMask();
+
+		void AudioConfigurationChanged(bool deviceChanged);
 
 		// Audio 360
 
@@ -357,8 +361,16 @@ namespace RenderHeads.Media.AVProVideo
 		public double  minimumRequiredBitRate;
 
 		/// <summary>The minimum resolution of the media to cache.</summary>
-		/// <remark>Only supported on iOS 14 and later.</remark>
+		/// <remark>Only supported on Android and iOS 14 and later.</remark>
 		public Vector2 minimumRequiredResolution;
+
+		/// <summary>The maximum bitrate of the media to cache in bits per second.</summary>
+		/// <remark>Only supported on Android.</remark>
+		public double maximumRequiredBitRate;
+
+		/// <summary>The maximum resolution of the media to cache.</summary>
+		/// <remark>Only supported on Android.</remark>
+		public Vector2 maximumRequiredResolution;
 
 		/// <summary>Human readable title for the cached media.</summary>
 		/// <remark>iOS: This value will be displayed in the usage pane of the settings app.</remark>
@@ -379,7 +391,9 @@ namespace RenderHeads.Media.AVProVideo
 		/// <summary>The media is cached.</summary>
 		Cached,
 		/// <summary>The media is not cached, something went wrong - check the log.</summary>
-		Failed
+		Failed,
+		/// <summary>The media caching is paused.</summary>
+		Paused
 	}
 
 	/// <summary>Interface for the media cache.</summary>
@@ -399,6 +413,14 @@ namespace RenderHeads.Media.AVProVideo
 		/// <param name="url">The url of the media.</param>
 		void CancelDownloadOfMediaToCache(string url);
 
+		/// <summary>Pause the download of the media specified by url.</summary>
+		/// <param name="url">The url of the media.</param>
+		void PauseDownloadOfMediaToCache(string url);
+
+		/// <summary>Resume the download of the media specified by url.</summary>
+		/// <param name="url">The url of the media.</param>
+		void ResumeDownloadOfMediaToCache(string url);
+
 		/// <summary>Remove the cached media specified by url.</summary>
 		/// <param name="url">The url of the media.</param>
 		void RemoveMediaFromCache(string url);
@@ -409,9 +431,9 @@ namespace RenderHeads.Media.AVProVideo
 		/// <returns>The status of the media.</returns>
 		CachedMediaStatus GetCachedMediaStatus(string url, ref float progress);
 
-		/// <summary>Test if the currently open media is cached.</summary>
-		/// <returns>True if the media is cached, false otherwise.</returns>
-		bool IsMediaCached();
+//		/// <summary>Test if the currently open media is cached.</summary>
+//		/// <returns>True if the media is cached, false otherwise.</returns>
+//		bool IsMediaCached();
 	}
 
 	#endregion
@@ -448,6 +470,11 @@ namespace RenderHeads.Media.AVProVideo
 		long GetTextureTimeStamp();
 
 		/// <summary>
+		/// Returns the DAR/SAR ratio
+		/// </summary>
+		float GetTexturePixelAspectRatio();
+
+		/// <summary>
 		/// Returns true if the image on the texture is upside-down
 		/// </summary>
 		bool RequiresVerticalFlip();
@@ -471,6 +498,16 @@ namespace RenderHeads.Media.AVProVideo
 		/// Returns the current transformation required to convert from YpCbCr to RGB colorspaces.
 		/// </summary>
 		Matrix4x4 GetYpCbCrTransform();
+
+		/// <summary>
+		/// The affine transform of the texture as an array of six floats: [a, b, c, d, tx, ty].
+		/// </summary>
+		float[] GetAffineTransform();
+
+		/// <summary>
+		/// The full 4x4 transform of the texture
+		/// </summary>
+		Matrix4x4 GetTextureMatrix();
 
 #if AVPRO_NEW_GAMMA
 		/// <summary>
@@ -618,6 +655,16 @@ namespace RenderHeads.Media.AVProVideo
 	[System.Serializable]
 	public struct VideoResolveOptions
 	{
+		public enum AspectRatio
+		{
+			NoScaling,
+			FitVertically,
+			FitHorizontally,
+			FitInside,
+			FitOutside,
+			Stretch
+		}
+
 		[SerializeField] public bool applyHSBC;
 		[SerializeField, Range(0f, 1f)]	public float hue;
 		[SerializeField, Range(0f, 1f)]	public float saturation;
@@ -626,6 +673,7 @@ namespace RenderHeads.Media.AVProVideo
 		[SerializeField, Range(0.0001f, 10f)]	public float gamma;
 		[SerializeField] public Color tint;
 		[SerializeField] public bool generateMipmaps;
+		[SerializeField] public AspectRatio aspectRatio;
 
 		public bool IsColourAdjust()
 		{
@@ -646,6 +694,7 @@ namespace RenderHeads.Media.AVProVideo
 			VideoResolveOptions result = new VideoResolveOptions()
 			{
 				tint = Color.white,
+				aspectRatio = AspectRatio.Stretch,
 			};
 			result.ResetColourAdjust();
 
@@ -759,6 +808,13 @@ namespace RenderHeads.Media.AVProVideo
 			System,						// Default
 			Unity,						// ExoPlayer API only
 			FacebookAudio360,			// ExoPlayer API only
+		}
+
+		public enum TextureFiltering
+		{
+			Point,
+			Bilinear,
+			Trilinear,
 		}
 
 		public const int Default_MinBufferTimeMs					= 50000;	// Only valid when using ExoPlayer (default comes from DefaultLoadControl.DEFAULT_MIN_BUFFER_MS)
@@ -898,6 +954,11 @@ namespace RenderHeads.Media.AVProVideo
 			{
 				return _ranges[index];
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"TimeRanges: {{ MinTime: {MinTime}, MaxTime: {MaxTime}, Duration: {Duration}, Count: {Count} }}";
 		}
 
 		internal TimeRanges(TimeRange[] ranges)

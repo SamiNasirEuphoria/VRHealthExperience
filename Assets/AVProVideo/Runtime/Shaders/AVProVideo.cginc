@@ -6,7 +6,9 @@
 //#define AVPRO_CHEAP_GAMMA_CONVERSION
 
 #if defined (SHADERLAB_GLSL)
+	#define AVPRO_CHEAP_GAMMA_CONVERSION
 	#define INLINE
+	#define FIXED float
 	#define HALF float
 	#define HALF2 vec2
 	#define HALF3 vec3
@@ -20,6 +22,7 @@
 	#define LERP mix
 #else
 	#define INLINE inline
+	#define FIXED fixed
 	#define HALF half
 	#define HALF2 half2
 	#define HALF3 half3
@@ -66,13 +69,16 @@ INLINE bool IsStereoEyeLeft()
 	// OVR_multiview extension
 	return (UNITY_VIEWID == 0);
 #else
-	// NOTE: Bug #1165: _WorldSpaceCameraPos is not correct in multipass VR (when skybox is used) but UNITY_MATRIX_I_V seems to be
-	#if defined(UNITY_MATRIX_I_V)
+	#if defined(SHADERLAB_GLSL) && defined(USING_URP)
+		// NOTE: Bug #1416: URP + OES
+		FLOAT3 renderCameraPos = FLOAT3( gl_ModelViewMatrixInverseTranspose[0][3], gl_ModelViewMatrixInverseTranspose[1][3], gl_ModelViewMatrixInverseTranspose[2][3] );
+	#elif defined(UNITY_MATRIX_I_V)
+		// NOTE: Bug #1165: _WorldSpaceCameraPos is not correct in multipass VR (when skybox is used) but UNITY_MATRIX_I_V seems to be
 		FLOAT3 renderCameraPos = UNITY_MATRIX_I_V._m03_m13_m23;
 	#else
 		FLOAT3 renderCameraPos = _WorldSpaceCameraPos.xyz;
 	#endif
-
+	
 	float fL = distance(_WorldCameraPosition - _WorldCameraRight, renderCameraPos);
 	float fR = distance(_WorldCameraPosition + _WorldCameraRight, renderCameraPos);
 	return (fL < fR);
@@ -346,9 +352,17 @@ INLINE FLOAT3 ConvertYpCbCrToRGB(FLOAT3 YpCbCr, FLOAT4X4 YpCbCrTransform)
 #endif
 }
 
+#if defined(SHADERLAB_GLSL)
+	#if __VERSION__ < 300
+		#define TEX_EXTERNAL(sampler, uv) texture2D(sampler, uv.xy);
+	#else
+		#define TEX_EXTERNAL(sampler, uv) texture(sampler, uv.xy)
+	#endif
+#endif
+
 INLINE HALF4 SampleRGBA(sampler2D tex, FLOAT2 uv)
 {
-#if defined(SHADERLAB_GLSL)		// GLSL doesn't support tex2D, so just return for now
+#if defined(SHADERLAB_GLSL)		// GLSL doesn't support tex2D, and Adreno GPU doesn't support passing sampler as a parameter, so just return if this is called
 	return HALF4(1.0, 1.0, 0.0, 1.0);
 #else
 	HALF4 rgba = tex2D(tex, uv);
@@ -361,7 +375,7 @@ INLINE HALF4 SampleRGBA(sampler2D tex, FLOAT2 uv)
 
 INLINE HALF4 SampleYpCbCr(sampler2D luma, sampler2D chroma, FLOAT2 uv, FLOAT4X4 YpCbCrTransform)
 {
-#if defined(SHADERLAB_GLSL)		// GLSL doesn't support tex2D, so just return for now
+#if defined(SHADERLAB_GLSL)		// GLSL doesn't support tex2D, and Adreno GPU doesn't support passing sampler as a parameter, so just return if this is called
 	return HALF4(1.0, 1.0, 0.0, 1.0);
 #else
 #if defined(SHADER_API_METAL) || defined(SHADER_API_GLES) || defined(SHADER_API_GLES3)
@@ -379,8 +393,8 @@ INLINE HALF4 SampleYpCbCr(sampler2D luma, sampler2D chroma, FLOAT2 uv, FLOAT4X4 
 
 INLINE HALF SamplePackedAlpha(sampler2D tex, FLOAT2 uv)
 {
-#if defined(SHADERLAB_GLSL)	// GLSL doesn't support tex2D, so just return for now
-	return 0.5;
+#if defined(SHADERLAB_GLSL)		// GLSL doesn't support tex2D, and Adreno GPU doesn't support passing sampler as a parameter, so just return if this is called
+	return 0.0;
 #else
 	HALF alpha;
 #if defined(USE_YPCBCR)
@@ -415,8 +429,13 @@ INLINE HALF3 ApplyHSBEffect(HALF3 color, FIXED4 hsbc)
 
 	HALF3 result = color;
 	result.rgb = ApplyHue(result, hue);
-	result.rgb = (result - 0.5f) * contrast + 0.5f + brightness;
+	result.rgb = (result - 0.5) * contrast + 0.5 + brightness;
+
+	#if defined(SHADERLAB_GLSL)
+	result.rgb = LERP(vec3(Luminance(result)), result, saturation);
+	#else
 	result.rgb = LERP(Luminance(result), result, saturation);
+	#endif
 	
 	return result;
 }

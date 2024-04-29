@@ -191,7 +191,6 @@ namespace RenderHeads.Media.AVProVideo.Editor
 			}
 			if (_previewTexture)
 			{
-				//Debug.Log("closing RESOLVE");
 				RenderTexture.ReleaseTemporary(_previewTexture); _previewTexture = null;
 			}
 		}
@@ -205,7 +204,8 @@ namespace RenderHeads.Media.AVProVideo.Editor
 
 				if (!_materialResolve)
 				{
-					_materialResolve = VideoRender.CreateResolveMaterial();
+					_materialResolve = VideoRender.CreateResolveMaterial( false );
+					VideoRender.SetupResolveMaterial(_materialResolve, VideoResolveOptions.Create());
 				}
 				if (!_materialIMGUI)
 				{
@@ -311,7 +311,7 @@ namespace RenderHeads.Media.AVProVideo.Editor
 					{
 						texture = _previewTexture;
 					}
-					_lastTextureRatio = textureRatio = (float)texture.width / (float)texture.height;
+					_lastTextureRatio = textureRatio = (((float)texture.width / (float)texture.height) * textureSource.GetTexturePixelAspectRatio());
 				}
 
 				// Reserve rectangle for texture
@@ -383,7 +383,6 @@ namespace RenderHeads.Media.AVProVideo.Editor
 					//GUI.color = Color.white;
 
 					// Draw the texture
-					Matrix4x4 prevMatrix = GUI.matrix;
 					if (textureSource != null && textureSource.RequiresVerticalFlip())
 					{
 						//	GUIUtility.ScaleAroundPivot(new Vector2(1f, -1f), new Vector2(0f, textureRect.y + (textureRect.height / 2f)));
@@ -412,7 +411,7 @@ namespace RenderHeads.Media.AVProVideo.Editor
 
 								if (_previewTexture)
 								{
-									EditorGUI.DrawPreviewTexture(textureRect, _previewTexture, _materialIMGUI, ScaleMode.ScaleToFit);
+									EditorGUI.DrawPreviewTexture(textureRect, _previewTexture, _materialIMGUI, ScaleMode.ScaleToFit, textureRatio);
 								}
 								//EditorGUI.DrawTextureTransparent(textureRect, rt, ScaleMode.ScaleToFit);
 
@@ -438,7 +437,6 @@ namespace RenderHeads.Media.AVProVideo.Editor
 							//EditorGUI.DrawTextureAlpha(textureRect, texture, ScaleMode.ScaleToFit);
 						}
 					}
-					GUI.matrix = prevMatrix;
 				}
 			}
 

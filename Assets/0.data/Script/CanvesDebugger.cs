@@ -18,7 +18,7 @@ public class CanvesDebugger : MonoBehaviour
     {
         for (int i=0; i< gameObjects.Length; i++)
         {
-            debugText.text += objectNames[i] + " " + gameObjects[i].transform.position + "\n";
+            debugText.text += objectNames[i] + " " + gameObjects[i].transform.position + "\n"+ gameObjects[i].transform.rotation;
         }
     }
     IEnumerator Wait()

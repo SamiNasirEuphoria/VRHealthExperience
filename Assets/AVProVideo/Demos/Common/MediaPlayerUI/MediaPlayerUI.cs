@@ -1,4 +1,4 @@
-﻿// UnityEngine.UI was moved to a package in 2019.2.0
+// UnityEngine.UI was moved to a package in 2019.2.0
 // Unfortunately no way to test for this across all Unity versions yet
 // You can set up the asmdef to reference the new package, but the package doesn't 
 // existing in Unity 2017 etc, and it throws an error due to missing reference
@@ -406,7 +406,7 @@ namespace RenderHeads.Media.AVProVideo.Demos
 		{
 			if (_mediaPlayer && _mediaPlayer.Control != null)
 			{
-				if (_mediaPlayer.Control.IsMuted())
+				if (_mediaPlayer.AudioMuted)
 				{
 					MuteAudio(false);
 				}
@@ -422,7 +422,7 @@ namespace RenderHeads.Media.AVProVideo.Demos
 			if (_mediaPlayer && _mediaPlayer.Control != null)
 			{
 				// Change mute
-				_mediaPlayer.Control.MuteAudio(mute);
+				_mediaPlayer.AudioMuted = mute;
 
 				// Update the UI
 				// The UI element is constantly updated by the Update() method
@@ -563,6 +563,7 @@ namespace RenderHeads.Media.AVProVideo.Demos
 		private void UpdateAudioSpectrum()
 		{
 			bool showAudioSpectrum = false;
+#if !UNITY_IOS || UNITY_EDITOR
 			if (_mediaPlayer && _mediaPlayer.Control != null)
 			{
 				AudioSource audioSource = _mediaPlayer.AudioSource;
@@ -611,7 +612,7 @@ namespace RenderHeads.Media.AVProVideo.Demos
 					_audioSpectrumMaterial.SetFloat(_propSpectrumRange.Id, (float)sampleRange);
 				}
 			}
-
+#endif
 			if (_imageAudioSpectrum)
 			{
 				_imageAudioSpectrum.gameObject.SetActive(showAudioSpectrum);
@@ -872,7 +873,7 @@ namespace RenderHeads.Media.AVProVideo.Demos
 				{
 					float t = _volumeMaterial.GetFloat(_propMute.Id);
 					float d = 1f;
-					if (!_mediaPlayer.Control.IsMuted())
+					if (!_mediaPlayer.AudioMuted)
 					{
 						d = -1f;
 					}
@@ -925,7 +926,7 @@ namespace RenderHeads.Media.AVProVideo.Demos
 				}
 
 				// Update time slider position
-				if (_sliderTime)
+				if (_sliderTime && !_isHoveringOverTimeline)
 				{
 					double t = 0.0;
 					if (timelineRange.duration > 0.0)

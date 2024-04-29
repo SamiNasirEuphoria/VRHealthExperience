@@ -1,4 +1,4 @@
-﻿// NOTE: We only allow this script to compile in editor so we can easily check for compilation issues
+// NOTE: We only allow this script to compile in editor so we can easily check for compilation issues
 #if (UNITY_EDITOR || UNITY_ANDROID)
 
 #define AVPROVIDEO_FIXREGRESSION_TEXTUREQUALITY_UNITY542
@@ -78,7 +78,12 @@ namespace RenderHeads.Media.AVProVideo
 		}
 
 #if AVPROVIDEO_FIXREGRESSION_TEXTUREQUALITY_UNITY542
+	#if UNITY_2022_2_OR_NEWER
+		// Note: See https://docs.unity3d.com/2022.2/Documentation/ScriptReference/QualitySettings-masterTextureLimit.html
+		private int _textureQuality = QualitySettings.globalTextureMipmapLimit;
+	#else
 		private int _textureQuality = QualitySettings.masterTextureLimit;
+	#endif
 #endif
 		static private System.Threading.Thread		m_MainThread;
 
@@ -188,9 +193,9 @@ namespace RenderHeads.Media.AVProVideo
 
 			// Create a java-size video class up front
 			Debug.Log("s_Interface " + s_Interface);
-			m_Video = s_Interface.Call<AndroidJavaObject>( "CreatePlayer", (int)(m_API), options.useFastOesPath, options.preferSoftwareDecoder, (int)(options.audioOutput), (int)(options.audio360ChannelMode), Helper.GetUnityAudioSampleRate(), 
+			m_Video = s_Interface.Call<AndroidJavaObject>( "CreatePlayer", (int)(m_API), options.useFastOesPath, options.preferSoftwareDecoder, (int)(options.audioOutput), (int)(options.audio360ChannelMode), options.audio360LatencyMS, Helper.GetUnityAudioSampleRate(), 
 																		   options.StartWithHighestBandwidth(), options.minBufferMs, options.maxBufferMs, options.bufferForPlaybackMs, options.bufferForPlaybackAfterRebufferMs, 
-																		   (int)(options.GetPreferredPeakBitRateInBitsPerSecond()), (int)(vPreferredVideo.x), (int)(vPreferredVideo.y) );
+																		   (int)(options.GetPreferredPeakBitRateInBitsPerSecond()), (int)(vPreferredVideo.x), (int)(vPreferredVideo.y), (int)(options.blitTextureFiltering), options.forceEnableMediaCodecAsyncQueueing);
 			Debug.Log("m_Video " + m_Video);
 
 			if (m_Video != null)
@@ -268,7 +273,7 @@ namespace RenderHeads.Media.AVProVideo
 				_mediaHints = mediaHints;
 
 				Debug.Assert(m_Width == 0 && m_Height == 0 && m_Duration == 0.0);
-				bReturn = m_Video.Call<bool>("OpenVideoFromFile", path, offset, httpHeader, forceFileFormat, (int)(m_Options.audioOutput), (int)(m_Options.audio360ChannelMode));
+				bReturn = m_Video.Call<bool>("OpenVideoFromFile", path, offset, httpHeader, forceFileFormat, (int)(m_Options.audioOutput), (int)(m_Options.audio360ChannelMode), m_Options.audio360LatencyMS, m_Options.forceRtpTCP, m_Options.forceEnableMediaCodecAsyncQueueing);
 				if (!bReturn)
 				{
 					DisplayLoadFailureSuggestion(path);
@@ -282,10 +287,23 @@ namespace RenderHeads.Media.AVProVideo
 			return bReturn;
 		}
 
-//		public override void SetKeyServerAuthToken(string token)
-//		{
-//			_AuthToken = token;
-//		}
+		public override void SetKeyServerAuthToken(string token)
+		{
+			if (m_Video != null)
+			{
+				m_Video.Call("SetKeyServerAuthToken", token);
+			}
+		}
+
+		public override void SetOverrideDecryptionKey(byte[] key)
+		{
+			if( m_Video != null && 
+				key != null )
+			{
+				sbyte[] signedBytesKey = Array.ConvertAll( key, b => unchecked((sbyte)(b)) );
+				m_Video.Call("SetOverrideDecryptionKey", signedBytesKey);
+			}
+		}
 
 		private void DisplayLoadFailureSuggestion(string path)
 		{
@@ -900,7 +918,12 @@ namespace RenderHeads.Media.AVProVideo
 			}
 
 #if AVPROVIDEO_FIXREGRESSION_TEXTUREQUALITY_UNITY542
+	#if UNITY_2022_2_OR_NEWER
+		// Note: See https://docs.unity3d.com/2022.2/Documentation/ScriptReference/QualitySettings-masterTextureLimit.html
+			_textureQuality = QualitySettings.globalTextureMipmapLimit;
+	#else
 			_textureQuality = QualitySettings.masterTextureLimit;
+	#endif
 #endif
 		}
 
@@ -947,9 +970,21 @@ namespace RenderHeads.Media.AVProVideo
 #endif
 
 					int iNewBitrate = (int)(m_Options.GetPreferredPeakBitRateInBitsPerSecond());
-					/*bool bSetMaxResolutionAndBitrate =*/ m_Video.Call<bool>("SetPreferredVideoResolutionAndBirate", (int)(vPreferredVideo.x), (int)(vPreferredVideo.y), iNewBitrate);
+					/*bool bSetMaxResolutionAndBitrate =*/ m_Video.Call<bool>("SetPreferredVideoResolutionAndBitrate", (int)(vPreferredVideo.x), (int)(vPreferredVideo.y), iNewBitrate);
 				}
 			}
+
+/*
+			m_fTestTime += Time.deltaTime;
+			if( m_fTestTime > 4.0f )
+			{
+				m_fTestTime = 0.0f;
+
+				int iNumStreams = InternalGetAdaptiveStreamCount( TrackType.Video );
+				int iNewStreamIndex = UnityEngine.Random.Range( -1, iNumStreams );
+				SetVideoAdaptiveStreamIndex( TrackType.Video, iNewStreamIndex );
+			}
+*/
 
 			// Call before the native update call
 			UpdateTracks();
@@ -985,6 +1020,18 @@ namespace RenderHeads.Media.AVProVideo
 				newWidth = m_Video.Call<int>("GetWidth");
 				newHeight = m_Video.Call<int>("GetHeight");
 #endif
+				if (m_UseFastOesPath)
+				{
+					// OES incorrectly reports back the actual video width/height and not the texture width/height so we need to flip them back
+					UnityEngine.Matrix4x4 xfrm = GetTextureMatrix();
+					xfrm[0, 3] = 0.0f;
+					xfrm[1, 3] = 0.0f;
+					Vector4 size = new Vector4(newWidth, newHeight);
+					size = xfrm.inverse * size;
+					newWidth = (int)Mathf.Abs(size.x);
+					newHeight = (int)Mathf.Abs(size.y);
+				}
+
 				if (newWidth != m_Width || newHeight != m_Height)
 				{
 					m_Texture = null;
@@ -994,7 +1041,7 @@ namespace RenderHeads.Media.AVProVideo
 #if DLL_METHODS
 			int textureHandle = Native._GetTextureHandle(m_iPlayerIndex);
 #else
-				int textureHandle = m_Video.Call<int>("GetTextureHandle");
+			int textureHandle = m_Video.Call<int>("GetTextureHandle");
 #endif
 			if (textureHandle != 0 && textureHandle != m_TextureHandle)
 			{
@@ -1008,6 +1055,17 @@ namespace RenderHeads.Media.AVProVideo
 					newWidth = m_Video.Call<int>("GetWidth");
 					newHeight = m_Video.Call<int>("GetHeight");
 #endif
+					if (m_UseFastOesPath)
+					{
+						// OES incorrectly reports back the actual video width/height and not the texture width/height so we need to flip them back
+						UnityEngine.Matrix4x4 xfrm = GetTextureMatrix();
+						xfrm[0, 3] = 0.0f;
+						xfrm[1, 3] = 0.0f;
+						Vector4 size = new Vector4(newWidth, newHeight);
+						size = xfrm.inverse * size;
+						newWidth = (int)Mathf.Abs(size.x);
+						newHeight = (int)Mathf.Abs(size.y);
+					}
 				}
 
 				if (Mathf.Max(newWidth, newHeight) > SystemInfo.maxTextureSize)
@@ -1059,11 +1117,18 @@ namespace RenderHeads.Media.AVProVideo
 			}
 
 #if AVPROVIDEO_FIXREGRESSION_TEXTUREQUALITY_UNITY542
+	#if UNITY_2022_2_OR_NEWER
+			// Note: See https://docs.unity3d.com/2022.2/Documentation/ScriptReference/QualitySettings-masterTextureLimit.html
+			int textureQualityToTestAgainst = QualitySettings.globalTextureMipmapLimit;
+	#else
+			int textureQualityToTestAgainst = QualitySettings.masterTextureLimit;
+	#endif
+
 			// In Unity 5.4.2 and above the video texture turns black when changing the TextureQuality in the Quality Settings
 			// The code below gets around this issue.  A bug report has been sent to Unity.  So far we have tested and replicated the
 			// "bug" in Windows only, but a user has reported it in Android too.  
 			// Texture.GetNativeTexturePtr() must sync with the rendering thread, so this is a large performance hit!
-			if (_textureQuality != QualitySettings.masterTextureLimit)
+			if (_textureQuality != textureQualityToTestAgainst)
 			{
 				if (m_Texture != null && textureHandle > 0 && m_Texture.GetNativeTexturePtr() == System.IntPtr.Zero)
 				{
@@ -1071,7 +1136,7 @@ namespace RenderHeads.Media.AVProVideo
 					m_Texture.UpdateExternalTexture(new System.IntPtr(textureHandle));
 				}
 
-				_textureQuality = QualitySettings.masterTextureLimit;
+				_textureQuality = textureQualityToTestAgainst;
 			}
 #endif
 		}
@@ -1094,18 +1159,50 @@ namespace RenderHeads.Media.AVProVideo
 			return false;
 		}
 
+		private float[] m_affineTextureXfrm = new float[6] { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+
 		public override float[] GetTextureTransform()
 		{
 			float[] transform = null;
 			if (m_Video != null)
 			{
 				transform = m_Video.Call<float[]>("GetTextureTransform");
-				/*if (transform != null)
-				{
-					Debug.Log("xform: " + transform[0] + " " + transform[1] + " " + transform[2] + " " + transform[3] + " " + transform[4] + " " + transform[5]);
-				}*/
 			}
 			return transform;
+		}
+
+		// Return the texture transform as an affine transform
+		public override float[] GetAffineTransform()
+		{
+			float[] xfrm = new float[6] { 1, 0, 0, 1, 0, 0 };
+			if (m_Video == null)
+				return xfrm;
+
+			float[] transform = m_Video.Call<float[]>("GetTextureTransform");
+			if (transform != null)
+			{
+				xfrm[0] = transform[0];
+				xfrm[1] = transform[1];
+				xfrm[2] = transform[4];
+				xfrm[3] = transform[5];
+				xfrm[4] = transform[12];
+				xfrm[5] = transform[13];
+			}
+			return xfrm;
+		}
+
+		public override Matrix4x4 GetTextureMatrix()
+		{
+			if (m_Video == null)
+				return Matrix4x4.identity;
+			float[] transform = m_Video.Call<float[]>("GetTextureTransform");
+			if (transform == null)
+				return Matrix4x4.identity;
+			Vector4 v0 = new Vector4(transform[ 0], transform[ 1], transform[ 2], transform[ 3]);
+			Vector4 v1 = new Vector4(transform[ 4], transform[ 5], transform[ 6], transform[ 7]);
+			Vector4 v2 = new Vector4(transform[ 8], transform[ 9], transform[10], transform[11]);
+			Vector4 v3 = new Vector4(transform[12], transform[13], transform[14], transform[15]);
+			return new Matrix4x4(v0, v1, v2, v3);
 		}
 
 		public override void Dispose()
@@ -1157,6 +1254,8 @@ namespace RenderHeads.Media.AVProVideo
 						}
 						_seekableTimes.CalculateRange();
 					}
+
+					seekableReturnObject.Dispose();
 				}
 
 				// Buffered time ranges
@@ -1177,6 +1276,8 @@ namespace RenderHeads.Media.AVProVideo
 						}
 						_bufferedTimes.CalculateRange();
 					}
+
+					bufferedReturnObject.Dispose();
 				}
 			}
 		}
@@ -1332,7 +1433,16 @@ namespace RenderHeads.Media.AVProVideo
 
 								if (bReturn)
 								{
-									result = new VideoTrack(trackIndex, aReturn[1], aReturn[2], (aReturn[3] == "1"));
+									VideoTrack videoTrack = new VideoTrack(trackIndex, aReturn[1], aReturn[2], (aReturn[3] == "1"));
+
+									int bitrate = 0;
+									bool gotBitrate = Int32.TryParse(aReturn[4], out bitrate);
+									if( gotBitrate )
+									{
+										videoTrack.Bitrate = bitrate;
+									}
+
+									result = videoTrack;
 
 									isActiveTrack = (m_Video != null && m_Video.Call<int>("GetCurrentVideoTrackIndex") == trackIndex);
 								}
@@ -1402,6 +1512,94 @@ namespace RenderHeads.Media.AVProVideo
 			return result;
 		}
 
+		internal /*override*/ int InternalGetAdaptiveStreamCount(TrackType trackType, int trackIndex = -1)
+		{
+			int result = 0;
+			switch (trackType)
+			{
+				case TrackType.Video:
+					{
+						result = (m_Video != null) ? m_Video.Call<int>("GetNumberVideoAdaptiveStreams", trackIndex) : 0;
+
+						Debug.Log("[AVProVideo]: InternalGetAdaptiveStreamCount return = " + result);
+						break;
+					}
+				case TrackType.Audio:
+					{
+						break;
+					}
+				case TrackType.Text:
+					{
+						break;
+					}
+			}
+			return result;
+		}
+
+		internal /*override*/ void InternalGetAdaptiveStreamInfo(TrackType trackType, int trackIndex = -1)
+		{
+			switch( trackType )
+			{
+				case TrackType.Video:
+					{
+						if( m_Video != null )
+						{
+							AndroidJavaObject returnObject = m_Video.Call<AndroidJavaObject>("GetVideoAdaptiveStreamInfo", trackIndex);
+							if( returnObject.GetRawObject().ToInt32() != 0 )
+							{
+								String[] aReturn = AndroidJNIHelper.ConvertFromJNIArray<String[]>(returnObject.GetRawObject());
+								bool bReturn = (aReturn.Length > 0) ? (int.Parse(aReturn[0]) == 1) : false;
+
+								string toLog = "";
+								foreach( string str in aReturn )	{ toLog += str + ", "; }
+								Debug.Log( "[AVProVideo]: InternalGetAdaptiveStreamInfo return = " + toLog );
+
+								if ( bReturn )
+								{
+								}
+
+								returnObject.Dispose();
+							}
+						}
+					}
+					break;
+
+				case TrackType.Audio:
+					{
+					}
+					break;
+
+				case TrackType.Text:
+					{
+					}
+					break;
+			}
+		}
+
+		internal /*override*/ int SetVideoAdaptiveStreamIndex(TrackType trackType, int streamIndex)
+		{
+			int result = 0;
+			switch( trackType )
+			{
+				case TrackType.Video:
+					{
+						Debug.Log("[AVProVideo]: SetVideoAdaptiveStreamIndex : streamIndex = " + streamIndex);
+
+						result = (m_Video != null) ? m_Video.Call<int>("SetVideoAdaptiveStreams", streamIndex) : 0;
+						break;
+					}
+				case TrackType.Audio:
+					{
+						break;
+					}
+				case TrackType.Text:
+					{
+						break;
+					}
+			}
+			return result;
+		}
+
 		private Vector2 GetPreferredVideoResolution(MediaPlayer.OptionsAndroid.Resolution preferredMaximumResolution, Vector2 customPreferredMaximumResolution)
 		{
 			Vector2 vResolution = new Vector2( 0.0f, 0.0f );
@@ -1454,13 +1652,22 @@ namespace RenderHeads.Media.AVProVideo
 				double dMinBitrate = -1.0f;
 				int iMinWidth = -1;
 				int iMinHeight = -1;
+
+				double dMaxBitrate = -1.0f;
+				int iMaxWidth = -1;
+				int iMaxHeight = -1;
+				
 				if (options != null )
 				{
 					dMinBitrate = options.minimumRequiredBitRate;
 					iMinWidth = (int)( options.minimumRequiredResolution.x );
 					iMinHeight = (int)( options.minimumRequiredResolution.y );
+
+					dMaxBitrate = options.maximumRequiredBitRate;
+					iMaxWidth = (int)(options.maximumRequiredResolution.x);
+					iMaxHeight = (int)(options.maximumRequiredResolution.y);
 				}
-				m_Video.Call("AddMediaToCache", url, headers, dMinBitrate, iMinWidth, iMinHeight);
+				m_Video.Call("AddMediaToCache", url, headers, dMinBitrate, iMinWidth, iMinHeight, dMaxBitrate, iMaxWidth, iMaxHeight);
 			}
 		}
 
@@ -1477,6 +1684,22 @@ namespace RenderHeads.Media.AVProVideo
 			if (m_Video != null)
 			{
 				m_Video.Call("CancelDownloadOfMediaToCache", url);
+			}
+		}
+
+		public override void PauseDownloadOfMediaToCache(string url)
+		{
+			if (m_Video != null)
+			{
+				m_Video.Call("PauseDownloadOfMediaToCache", url);
+			}
+		}
+
+		public override void ResumeDownloadOfMediaToCache(string url)
+		{
+			if (m_Video != null)
+			{
+				m_Video.Call("ResumeDownloadOfMediaToCache", url);
 			}
 		}
 

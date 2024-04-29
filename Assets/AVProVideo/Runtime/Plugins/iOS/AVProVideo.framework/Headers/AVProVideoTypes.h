@@ -54,6 +54,7 @@ typedef NS_ENUM(int, AVPPlayerAudioOutputMode)
 {
 	AVPPlayerAudioOutputModeSystemDirect,
 	AVPPlayerAudioOutputModeCapture,
+	AVPPlayerAudioOutputModeSystemDirectWithCapture,
 };
 
 typedef NS_OPTIONS(int, AVPPlayerAudioOutputSettingsFlags)

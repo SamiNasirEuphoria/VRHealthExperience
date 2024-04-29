@@ -33,6 +33,7 @@
 			#pragma multi_compile __ HIGH_QUALITY
 			#pragma multi_compile __ APPLY_GAMMA
 			#pragma multi_compile __ USING_DEFAULT_TEXTURE
+			#pragma multi_compile __ USING_URP
 
 			#extension GL_OES_EGL_image_external : require
 			#extension GL_OES_EGL_image_external_essl3 : enable
@@ -54,7 +55,7 @@
 				int eyeIndex = SetupStereoEyeIndex();
 				return (eyeIndex == 0);
 			#else
-	return IsStereoEyeLeft();
+				return IsStereoEyeLeft();
 			#endif
 		}
 
@@ -67,7 +68,7 @@
 #else
 		varying vec3 texVal;
 		uniform vec4 _MainTex_ST;
-		uniform mat4 _TextureMatrix;
+		uniform mat4 _MainTex_Xfrm;
 #endif
 #if defined(STEREO_DEBUG)
 		varying vec4 tint;
@@ -82,7 +83,13 @@
 
 			void main()
 			{
+#if defined(STEREO_MULTIVIEW_ON)
+				int eyeIndex = SetupStereoEyeIndex();
+				mat4 vpMatrix = GetStereoMatrixVP(eyeIndex);
+				gl_Position = vpMatrix * unity_ObjectToWorld * gl_Vertex;
+#else
 				gl_Position = XFormObjectToClip(gl_Vertex);
+#endif
 
 #if defined(HIGH_QUALITY)
 				texNormal = normalize(gl_Normal.xyz);
@@ -101,7 +108,7 @@
 	#endif
 
 				// Apply texture transformation matrix - adjusts for offset/cropping (when the decoder decodes in blocks that overrun the video frame size, it pads)
-				texVal.xy = (_TextureMatrix * vec4(texVal.x, texVal.y, 0.0, 1.0)).xy;
+				texVal.xy = (_MainTex_Xfrm * vec4(texVal.x, texVal.y, 0.0, 1.0)).xy;
 
 	#if defined(STEREO_TOP_BOTTOM) || defined(STEREO_LEFT_RIGHT)
 				vec4 scaleOffset = GetStereoScaleOffset(Android_IsStereoEyeLeft(), false);
@@ -133,7 +140,7 @@
 	#if defined(STEREO_TOP_BOTTOM) || defined(STEREO_LEFT_RIGHT)
 			varying vec4 texScaleOffset;
 	#endif
-			uniform mat4 _TextureMatrix;
+			uniform mat4 _MainTex_Xfrm;
 #else
 			varying vec3 texVal;
 #endif
@@ -200,7 +207,7 @@
 	#endif
 
 				// Apply texture transformation matrix - adjusts for offset/cropping (when the decoder decodes in blocks that overrun the video frame size, it pads)
-				uv.xy = (_TextureMatrix * vec4(uv.x, uv.y, 0.0, 1.0)).xy;
+				uv.xy = (_MainTex_Xfrm * vec4(uv.x, uv.y, 0.0, 1.0)).xy;
 
 	#if defined(STEREO_TOP_BOTTOM) || defined(STEREO_LEFT_RIGHT)
 				uv.xy *= texScaleOffset.xy;

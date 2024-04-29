@@ -61,7 +61,7 @@ namespace RenderHeads.Media.AVProVideo
 
 		private void LogXRDeviceDetails()
 		{
-#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER && !UNITY_TVOS
 			string logOutput = "[AVProVideo] XR Device details: UnityEngine.XR.XRSettings.loadedDeviceName = " + UnityEngine.XR.XRSettings.loadedDeviceName + " | supportedDevices = ";
 
 			string[] aSupportedDevices = UnityEngine.XR.XRSettings.supportedDevices;
@@ -164,6 +164,12 @@ namespace RenderHeads.Media.AVProVideo
 
 			if (_foundCamera != null)
 			{
+				#if ANDROID_URP
+					Shader.EnableKeyword("USING_URP");
+				#else
+					Shader.DisableKeyword("USING_URP");
+				#endif
+
 				Shader.SetGlobalVector(PropWorldCameraPosition.Id, _foundCamera.transform.position);
 				Shader.SetGlobalVector(PropWorldCameraRight.Id, _foundCamera.transform.right);
 			}

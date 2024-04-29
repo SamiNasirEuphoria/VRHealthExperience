@@ -148,11 +148,13 @@ namespace RenderHeads.Media.AVProVideo
 
 				if (plane == 0)
 				{
-					VideoRender.SetupMaterialForMedia(_material, _media, _propTexture.Id, texture);
+					VideoRender.SetupMaterialForMedia(_material, _media, _propTexture.Id, texture, texture == _defaultTexture);
 					_lastTextureApplied = texture;
 
+					#if (!UNITY_EDITOR && UNITY_ANDROID)
 					if (texture == _defaultTexture)	{ _material.EnableKeyword("USING_DEFAULT_TEXTURE"); }
 					else							{ _material.DisableKeyword("USING_DEFAULT_TEXTURE"); }
+					#endif
 
 					if (texture != null)
 					{
